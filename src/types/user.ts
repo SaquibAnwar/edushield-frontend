@@ -1,4 +1,4 @@
-// User related types
+// User related types and enums
 export enum Gender {
   MALE = 'Male',
   FEMALE = 'Female',
@@ -21,11 +21,10 @@ export enum ExamType {
 
 export enum FeeType {
   TUITION = 'Tuition',
-  LIBRARY = 'Library',
-  LABORATORY = 'Laboratory',
-  SPORTS = 'Sports',
+  EXAM = 'Exam',
   TRANSPORT = 'Transport',
-  OTHER = 'Other',
+  LIBRARY = 'Library',
+  MISC = 'Misc',
 }
 
 export enum PaymentStatus {
@@ -33,4 +32,163 @@ export enum PaymentStatus {
   PENDING = 'Pending',
   OVERDUE = 'Overdue',
   PARTIAL = 'Partial',
+}
+
+export enum ParentType {
+  PRIMARY = 'Primary',
+  SECONDARY = 'Secondary',
+  GUARDIAN = 'Guardian',
+}
+
+// Student entity interface
+export interface Student {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  dateOfBirth: string;
+  address: string;
+  gender: Gender;
+  rollNumber: string;
+  enrollmentDate: string;
+  status: StudentStatus;
+  grade?: string;
+  section?: string;
+  userId?: string;
+  parentId?: string;
+  fullName: string;
+  age: number;
+  isEnrolled: boolean;
+  assignedFaculties: FacultyAssignment[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Faculty entity interface
+export interface Faculty {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  dateOfBirth: string;
+  address: string;
+  gender: Gender;
+  department: string;
+  subject: string;
+  employeeId?: string;
+  hireDate: string;
+  isActive: boolean;
+  userId?: string;
+  fullName: string;
+  age: number;
+  yearsOfService: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Parent entity interface
+export interface Parent {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  alternatePhoneNumber?: string;
+  dateOfBirth: string;
+  address: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+  gender: Gender;
+  occupation?: string;
+  employer?: string;
+  workPhone?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelationship?: string;
+  userId?: string;
+  parentType: ParentType;
+  isEmergencyContact: boolean;
+  isAuthorizedToPickup: boolean;
+  isActive: boolean;
+  fullName: string;
+  age: number;
+  fullAddress: string;
+  childrenCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Student Performance entity interface
+export interface StudentPerformance {
+  id: string;
+  studentId: string;
+  studentFirstName: string;
+  studentLastName: string;
+  subject: string;
+  examType: ExamType;
+  examDate: string;
+  score: number;
+  maxScore?: number;
+  examTitle?: string;
+  comments?: string;
+  percentage?: number;
+  grade: string;
+  formattedScore: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Student Fee entity interface
+export interface StudentFee {
+  id: string;
+  studentId: string;
+  studentFirstName: string;
+  studentLastName: string;
+  studentRollNumber: string;
+  feeType: FeeType;
+  term: string;
+  totalAmount: number;
+  amountPaid: number;
+  amountDue: number;
+  paymentStatus: PaymentStatus;
+  dueDate: string;
+  lastPaymentDate?: string;
+  fineAmount: number;
+  notes?: string;
+  isOverdue: boolean;
+  daysOverdue: number;
+  paymentStatusDescription: string;
+  feeTypeDescription: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Faculty Assignment interface
+export interface FacultyAssignment {
+  id: string;
+  studentId: string;
+  facultyId: string;
+  assignedDate: string;
+  isActive: boolean;
+  notes?: string;
+  faculty?: Faculty;
+}
+
+// Parent Student relationship interface
+export interface ParentStudent {
+  id: string;
+  parentId: string;
+  studentId: string;
+  relationship: string;
+  isPrimaryContact: boolean;
+  isAuthorizedToPickup: boolean;
+  isEmergencyContact: boolean;
+  isActive: boolean;
+  notes?: string;
+  parent?: Parent;
+  student?: Student;
 }
