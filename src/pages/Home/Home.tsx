@@ -39,10 +39,13 @@ export const Home: React.FC = () => {
 
   const handleDevLogin = async (email: string) => {
     try {
+      console.log('Attempting dev login with email:', email);
       clearError();
       await loginWithDevAuth(email);
+      console.log('Dev login successful');
     } catch (error: any) {
       console.error('Dev login failed:', error);
+      console.error('Error details:', error.message);
     }
   };
 
@@ -307,7 +310,7 @@ export const Home: React.FC = () => {
                 <Button
                   variant="outlined"
                   size="large"
-                  onClick={() => handleDevLogin('kirakryto9ite@gmail.com')}
+                  onClick={() => handleDevLogin('kirakrypto9ite@gmail.com')}
                   sx={{ textTransform: 'none', py: 1.5 }}
                 >
                   Login as Parent

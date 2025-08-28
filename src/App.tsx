@@ -36,14 +36,10 @@ const theme = createTheme({
 });
 
 function App() {
-  console.log('App component rendering with routing...');
-  console.log('Current URL:', window.location.pathname);
-  
   return (
     <AuthProvider>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-
         <Router>
           <Routes>
             {/* Public Routes */}
@@ -83,18 +79,6 @@ function App() {
                 <ProtectedRoute requiredRoles={[UserRole.Faculty]}>
                   <FacultyDashboard />
                 </ProtectedRoute>
-              } 
-            />
-            
-            {/* Test Route */}
-            <Route 
-              path="/test" 
-              element={
-                <div style={{ padding: '20px' }}>
-                  <h1>Test Route Works!</h1>
-                  <p>If you can see this, routing is working.</p>
-                  <button onClick={() => window.history.back()}>Go Back</button>
-                </div>
               } 
             />
             
