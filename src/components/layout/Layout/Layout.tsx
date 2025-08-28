@@ -30,8 +30,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, className }) => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Get current path for active menu highlighting
-  const currentPath = window.location.pathname;
+
 
   return (
     <Box
@@ -73,7 +72,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, className }) => {
         isOpen={sidebarOpen}
         onToggle={handleSidebarToggle}
         userRole={user?.role || UserRole.Student}
-        currentPath={currentPath}
       />
 
       {/* Main Content */}

@@ -6,7 +6,7 @@ import { UserRole } from '../../../types/auth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRoles?: UserRole[];
+  requiredRoles?: readonly UserRole[];
   fallbackPath?: string;
 }
 
@@ -51,7 +51,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // Check role-based access if roles are specified
-  if (requiredRoles.length > 0 && !hasAnyRole(requiredRoles)) {
+  if (requiredRoles.length > 0 && !hasAnyRole(requiredRoles as UserRole[])) {
+    // Redirect to unauthorized page or appropriate dashboard
+    if (fallbackPath === '/unauthorized') {
+      return <Navigate to="/unauthorized" replace />;
+    }
+    
     // Redirect to appropriate dashboard based on user role
     const redirectPath = getRoleBasedRedirect(user.role);
     return (

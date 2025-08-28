@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -18,7 +19,6 @@ import {
   Assessment as ReportsIcon,
   Settings as SettingsIcon,
   Dashboard as DashboardIcon,
-
   Assignment as AssignmentIcon,
   Payment as PaymentIcon,
   Grade as GradeIcon,
@@ -32,7 +32,6 @@ export interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   userRole: UserRole;
-  currentPath: string;
 }
 
 interface MenuItem {
@@ -41,23 +40,34 @@ interface MenuItem {
   path?: string;
   onClick?: () => void;
   divider?: boolean;
+  disabled?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onToggle,
-  userRole,
-  currentPath
+  userRole
 }) => {
   const { logout, getDisplayName } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
+  
+  const currentPath = location.pathname;
 
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
       console.error('Logout failed:', error);
+    }
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    if (isMobile) {
+      onToggle(); // Close sidebar on mobile after navigation
     }
   };
 
@@ -81,7 +91,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {
         label: 'Dashboard',
         icon: <DashboardIcon />,
-        path: getRolePath(userRole)
+        path: getRolePath(userRole),
+        onClick: () => handleNavigation(getRolePath(userRole))
       }
     ];
 
@@ -93,22 +104,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {
             label: 'Manage Users',
             icon: <PeopleIcon />,
-            path: '/admin/users'
+            path: '/admin/users',
+            onClick: () => handleNavigation('/admin/users'),
+            disabled: true // Will be enabled in future tasks
           },
           {
             label: 'Academic Management',
             icon: <SchoolIcon />,
-            path: '/admin/academic'
+            path: '/admin/academic',
+            onClick: () => handleNavigation('/admin/academic'),
+            disabled: true // Will be enabled in future tasks
           },
           {
             label: 'Reports & Analytics',
             icon: <ReportsIcon />,
-            path: '/admin/reports'
+            path: '/admin/reports',
+            onClick: () => handleNavigation('/admin/reports'),
+            disabled: true // Will be enabled in future tasks
           },
           {
             label: 'System Settings',
             icon: <SettingsIcon />,
-            path: '/admin/settings'
+            path: '/admin/settings',
+            onClick: () => handleNavigation('/admin/settings'),
+            disabled: true // Will be enabled in future tasks
           }
         ];
 
@@ -119,22 +138,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {
             label: 'My Students',
             icon: <PeopleIcon />,
-            path: '/faculty/students'
+            path: '/faculty/students',
+            onClick: () => handleNavigation('/faculty/students'),
+            disabled: true // Will be enabled in future tasks
           },
           {
             label: 'Performance Management',
             icon: <GradeIcon />,
-            path: '/faculty/performance'
+            path: '/faculty/performance',
+            onClick: () => handleNavigation('/faculty/performance'),
+            disabled: true // Will be enabled in future tasks
           },
           {
             label: 'Assignments',
             icon: <AssignmentIcon />,
-            path: '/faculty/assignments'
+            path: '/faculty/assignments',
+            onClick: () => handleNavigation('/faculty/assignments'),
+            disabled: true // Will be enabled in future tasks
           },
           {
             label: 'Profile',
             icon: <ProfileIcon />,
-            path: '/faculty/profile'
+            path: '/faculty/profile',
+            onClick: () => handleNavigation('/faculty/profile'),
+            disabled: true // Will be enabled in future tasks
           }
         ];
 
@@ -145,22 +172,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {
             label: 'My Children',
             icon: <FamilyIcon />,
-            path: '/parent/children'
+            path: '/parent/children',
+            onClick: () => handleNavigation('/parent/children'),
+            disabled: true // Will be enabled in future tasks
           },
           {
             label: 'Performance',
             icon: <GradeIcon />,
-            path: '/parent/performance'
+            path: '/parent/performance',
+            onClick: () => handleNavigation('/parent/performance'),
+            disabled: true // Will be enabled in future tasks
           },
           {
             label: 'Fees & Payments',
             icon: <PaymentIcon />,
-            path: '/parent/fees'
+            path: '/parent/fees',
+            onClick: () => handleNavigation('/parent/fees'),
+            disabled: true // Will be enabled in future tasks
           },
           {
             label: 'Profile',
             icon: <ProfileIcon />,
-            path: '/parent/profile'
+            path: '/parent/profile',
+            onClick: () => handleNavigation('/parent/profile'),
+            disabled: true // Will be enabled in future tasks
           }
         ];
 
@@ -171,22 +206,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {
             label: 'My Performance',
             icon: <GradeIcon />,
-            path: '/student/performance'
+            path: '/student/performance',
+            onClick: () => handleNavigation('/student/performance'),
+            disabled: true // Will be enabled in future tasks
           },
           {
             label: 'Assignments',
             icon: <AssignmentIcon />,
-            path: '/student/assignments'
+            path: '/student/assignments',
+            onClick: () => handleNavigation('/student/assignments'),
+            disabled: true // Will be enabled in future tasks
           },
           {
             label: 'Fees',
             icon: <PaymentIcon />,
-            path: '/student/fees'
+            path: '/student/fees',
+            onClick: () => handleNavigation('/student/fees'),
+            disabled: true // Will be enabled in future tasks
           },
           {
             label: 'Profile',
             icon: <ProfileIcon />,
-            path: '/student/profile'
+            path: '/student/profile',
+            onClick: () => handleNavigation('/student/profile'),
+            disabled: true // Will be enabled in future tasks
           }
         ];
 
@@ -292,8 +335,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 variant="text"
                 startIcon={item.icon}
                 onClick={item.onClick}
+                disabled={item.disabled}
                 sx={{
-                  color: 'white',
+                  color: item.disabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
                   justifyContent: 'flex-start',
                   py: 1.5,
                   px: 2,
@@ -302,7 +346,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   borderRadius: 2,
                   bgcolor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
                   '&:hover': { 
-                    bgcolor: 'rgba(255, 255, 255, 0.1)' 
+                    bgcolor: item.disabled ? 'transparent' : 'rgba(255, 255, 255, 0.1)' 
+                  },
+                  '&.Mui-disabled': {
+                    color: 'rgba(255, 255, 255, 0.5)'
                   }
                 }}
               >
@@ -315,14 +362,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Box key={index} sx={{ mb: 1, display: 'flex', justifyContent: 'center' }}>
                 <IconButton
                   onClick={item.onClick}
+                  disabled={item.disabled}
                   sx={{
-                    color: 'white',
+                    color: item.disabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
                     width: 48,
                     height: 48,
                     borderRadius: 2,
                     bgcolor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
                     '&:hover': { 
-                      bgcolor: 'rgba(255, 255, 255, 0.1)' 
+                      bgcolor: item.disabled ? 'transparent' : 'rgba(255, 255, 255, 0.1)' 
+                    },
+                    '&.Mui-disabled': {
+                      color: 'rgba(255, 255, 255, 0.5)'
                     }
                   }}
                 >

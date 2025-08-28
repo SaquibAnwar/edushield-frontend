@@ -1,14 +1,8 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider } from './contexts/AuthContext';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { Home } from './pages/Home';
-import { AdminDashboard } from './pages/Admin';
-import { StudentDashboard } from './pages/Student';
-import { ParentDashboard } from './pages/Parent';
-import { FacultyDashboard } from './pages/Faculty';
-import { UserRole } from './types/auth';
+import { AppRoutes } from './routes';
 
 
 const theme = createTheme({
@@ -41,50 +35,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Home />} />
-            
-            {/* Protected Routes */}
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedRoute requiredRoles={[UserRole.Admin]}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/student" 
-              element={
-                <ProtectedRoute requiredRoles={[UserRole.Student]}>
-                  <StudentDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/parent" 
-              element={
-                <ProtectedRoute requiredRoles={[UserRole.Parent]}>
-                  <ParentDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/faculty" 
-              element={
-                <ProtectedRoute requiredRoles={[UserRole.Faculty]}>
-                  <FacultyDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            
-            {/* Fallback Route */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <AppRoutes />
         </Router>
       </ThemeProvider>
     </AuthProvider>
