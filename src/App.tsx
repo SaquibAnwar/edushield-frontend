@@ -1,6 +1,8 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Container, Typography, Box } from '@mui/material';
+import { Container } from '@mui/material';
+import { AuthProvider } from './contexts/AuthContext';
+import AuthTest from './components/auth/AuthTest';
 
 const theme = createTheme({
   palette: {
@@ -16,31 +18,14 @@ const theme = createTheme({
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Container maxWidth="lg">
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '100vh',
-            textAlign: 'center',
-          }}
-        >
-          <Typography variant="h2" component="h1" gutterBottom>
-            EduShield Frontend
-          </Typography>
-          <Typography variant="h5" component="h2" color="text.secondary">
-            Educational Management System
-          </Typography>
-          <Typography variant="body1" sx={{ mt: 2 }}>
-            Project foundation setup complete! ✅
-          </Typography>
-        </Box>
-      </Container>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Container maxWidth="lg" sx={{ py: 4 }}>
+          <AuthTest />
+        </Container>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 
