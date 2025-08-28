@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { AuthState, AuthAction, User, AuthResult } from '../types/auth';
+import type { AuthState, AuthAction } from '../types/auth';
 import { AuthService } from '../services/auth';
 import { storage } from '../utils/storage';
 
