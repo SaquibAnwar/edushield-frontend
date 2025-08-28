@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AuthResult, TokenPayload } from '../types/auth';
 import { storage } from '../utils/storage';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 export class AuthService {
   private static instance: AuthService;
