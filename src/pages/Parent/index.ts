@@ -1,1 +1,4 @@
-export { ParentDashboard, default } from './ParentDashboard';
+import ParentDashboard from './ParentDashboard';
+
+export { ParentDashboard };
+export default ParentDashboard;
