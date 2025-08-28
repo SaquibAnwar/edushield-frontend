@@ -59,8 +59,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const handleLogout = async () => {
     try {
       await logout();
+      // Explicitly navigate to home page after logout
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Logout failed:', error);
+      // Even if logout fails, navigate to home
+      navigate('/', { replace: true });
     }
   };
 

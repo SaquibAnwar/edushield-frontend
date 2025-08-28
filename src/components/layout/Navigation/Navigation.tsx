@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -25,6 +26,7 @@ interface NavigationProps {
 
 const Navigation: React.FC<NavigationProps> = ({ onSidebarToggle }) => {
   const { user, logout, getUserInitials, getDisplayName } = useAuth();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -39,8 +41,12 @@ const Navigation: React.FC<NavigationProps> = ({ onSidebarToggle }) => {
     handleUserMenuClose();
     try {
       await logout();
+      // Explicitly navigate to home page after logout
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Logout failed:', error);
+      // Even if logout fails, navigate to home
+      navigate('/', { replace: true });
     }
   };
 
