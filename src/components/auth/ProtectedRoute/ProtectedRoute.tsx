@@ -39,11 +39,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // Redirect to home if not authenticated
+  // Redirect to home if not authenticated (never redirect unauthenticated users to unauthorized page)
   if (!isAuthenticated || !user) {
     return (
       <Navigate 
-        to={fallbackPath} 
+        to="/" 
         state={{ from: location.pathname }} 
         replace 
       />
@@ -52,7 +52,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Check role-based access if roles are specified
   if (requiredRoles.length > 0 && !hasAnyRole(requiredRoles as UserRole[])) {
-    // Redirect to unauthorized page or appropriate dashboard
+    // Redirect to unauthorized page for role-based access denial
     if (fallbackPath === '/unauthorized') {
       return <Navigate to="/unauthorized" replace />;
     }
