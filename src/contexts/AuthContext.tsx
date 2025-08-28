@@ -136,6 +136,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         } else {
           // No stored auth data
+          console.log('AuthContext: No stored auth data, setting to logged out state');
           dispatch({ type: 'LOGOUT' });
         }
       } catch (error) {

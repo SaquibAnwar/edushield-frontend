@@ -46,10 +46,7 @@ export class AuthService {
    */
   async authenticateWithDevAuth(email: string): Promise<AuthResult> {
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/dev`, {
-        email
-      });
-
+      const response = await axios.post(`${API_BASE_URL}/auth/dev`, { email });
       const authResult: AuthResult = response.data;
       
       if (!authResult.success) {
@@ -64,7 +61,7 @@ export class AuthService {
       return authResult;
     } catch (error: any) {
       console.error('Dev authentication failed:', error);
-      throw new Error(error.response?.data?.errorMessage || error.response?.data?.error || 'Authentication failed');
+      throw new Error(error.response?.data?.errorMessage || error.response?.data?.error || error.message || 'Authentication failed');
     }
   }
 
