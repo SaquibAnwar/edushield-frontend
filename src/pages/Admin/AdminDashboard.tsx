@@ -52,7 +52,11 @@ export const AdminDashboard: React.FC = () => {
               <Typography variant="body2" color="text.secondary" mb={2}>
                 Manage students, faculty, and parents
               </Typography>
-              <Button variant="contained" size="small">
+              <Button 
+                variant="contained" 
+                size="small"
+                onClick={() => window.location.href = '/admin/users'}
+              >
                 Manage
               </Button>
             </Paper>

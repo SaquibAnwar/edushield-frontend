@@ -87,15 +87,14 @@ export interface CreateStudentRequest {
   lastName: string;
   email: string;
   phoneNumber: string;
-  dateOfBirth: string;
+  dateOfBirth: Date;
   address: string;
   gender: Gender;
-  rollNumber: string;
-  enrollmentDate: string;
-  status: StudentStatus;
+  enrollmentDate: Date;
   grade?: string;
   section?: string;
   parentId?: string;
+  facultyIds: string[];
 }
 
 export interface CreateFacultyRequest {
@@ -103,14 +102,13 @@ export interface CreateFacultyRequest {
   lastName: string;
   email: string;
   phoneNumber: string;
-  dateOfBirth: string;
+  dateOfBirth: Date;
   address: string;
   gender: Gender;
   department: string;
   subject: string;
-  employeeId?: string;
-  hireDate: string;
-  isActive: boolean;
+  hireDate: Date;
+  userId?: string;
 }
 
 export interface CreateParentRequest {
@@ -119,7 +117,7 @@ export interface CreateParentRequest {
   email: string;
   phoneNumber: string;
   alternatePhoneNumber?: string;
-  dateOfBirth: string;
+  dateOfBirth: Date;
   address: string;
   city?: string;
   state?: string;
@@ -135,7 +133,6 @@ export interface CreateParentRequest {
   parentType: ParentType;
   isEmergencyContact: boolean;
   isAuthorizedToPickup: boolean;
-  isActive: boolean;
 }
 
 export interface CreatePerformanceRequest {
@@ -232,3 +229,6 @@ export interface FacultyMetrics {
   recentPerformances: StudentPerformance[];
   averageClassGrade: string;
 }
+
+// Re-export DateConverter interface for convenience
+export type { DateConverter } from '../utils/dateUtils';

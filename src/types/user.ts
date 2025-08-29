@@ -1,8 +1,8 @@
-// User related types and enums
+// User related types and enums - aligned with backend enum values
 export enum Gender {
-  MALE = 'Male',
-  FEMALE = 'Female',
-  OTHER = 'Other',
+  MALE = 0,
+  FEMALE = 1,
+  OTHER = 2,
 }
 
 export enum StudentStatus {
@@ -35,9 +35,9 @@ export enum PaymentStatus {
 }
 
 export enum ParentType {
-  PRIMARY = 'Primary',
-  SECONDARY = 'Secondary',
-  GUARDIAN = 'Guardian',
+  PRIMARY = 0,
+  SECONDARY = 1,
+  GUARDIAN = 2,
 }
 
 // Student entity interface

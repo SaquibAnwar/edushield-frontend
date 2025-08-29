@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
+import { AdminRouteGuard } from '../components/auth/AdminRouteGuard';
 import { NotFound, Unauthorized } from '../components/common/ErrorPages';
 import { UserRole } from '../types/auth';
 import { ROUTE_PERMISSIONS } from '../utils/routeGuards';
@@ -8,9 +9,13 @@ import { ROUTE_PERMISSIONS } from '../utils/routeGuards';
 // Page imports
 import { Home } from '../pages/Home';
 import { AdminDashboard } from '../pages/Admin';
+import { AdminManagement } from '../pages/Admin/AdminManagement';
+import { AdminSettings } from '../pages/Admin/AdminSettings';
 import { StudentDashboard } from '../pages/Student';
 import { ParentDashboard } from '../pages/Parent';
 import { FacultyDashboard } from '../pages/Faculty';
+import { TestComponentsGuard } from '../components/ui/TestComponents/TestComponentsGuard';
+import TestForms from '../pages/TestForms';
 
 // Route configuration interface
 export interface RouteConfig {
@@ -38,21 +43,65 @@ export const routeConfigs: RouteConfig[] = [
     exact: true,
     description: 'Unauthorized access page'
   },
+  {
+    path: '/test-components',
+    element: <TestComponentsGuard />,
+    requiredRoles: ROUTE_PERMISSIONS.PUBLIC,
+    exact: true,
+    description: 'Test page for UI components and forms (admin-controlled)'
+  },
+  {
+    path: '/test-forms',
+    element: <TestForms />,
+    requiredRoles: ROUTE_PERMISSIONS.PUBLIC,
+    exact: true,
+    description: 'Test page for form implementations and backend integration'
+  },
 
-  // Admin routes
+  // Admin routes (using AdminRouteGuard for enhanced security)
   {
     path: '/admin',
-    element: <AdminDashboard />,
+    element: (
+      <AdminRouteGuard>
+        <AdminDashboard />
+      </AdminRouteGuard>
+    ),
     requiredRoles: ROUTE_PERMISSIONS.ADMIN_ONLY,
     exact: true,
     description: 'Admin dashboard with system overview'
   },
   {
     path: '/admin/dashboard',
-    element: <Navigate to="/admin" replace />,
+    element: (
+      <AdminRouteGuard>
+        <Navigate to="/admin" replace />
+      </AdminRouteGuard>
+    ),
     requiredRoles: ROUTE_PERMISSIONS.ADMIN_ONLY,
     exact: true,
     description: 'Redirect to admin dashboard'
+  },
+  {
+    path: '/admin/users',
+    element: (
+      <AdminRouteGuard>
+        <AdminManagement />
+      </AdminRouteGuard>
+    ),
+    requiredRoles: ROUTE_PERMISSIONS.ADMIN_ONLY,
+    exact: true,
+    description: 'Admin user management page with CRUD forms'
+  },
+  {
+    path: '/admin/settings',
+    element: (
+      <AdminRouteGuard>
+        <AdminSettings />
+      </AdminRouteGuard>
+    ),
+    requiredRoles: ROUTE_PERMISSIONS.ADMIN_ONLY,
+    exact: true,
+    description: 'Admin system settings page'
   },
 
   // Student routes
@@ -125,11 +174,11 @@ export const hasRouteAccess = (route: RouteConfig, userRole?: UserRole): boolean
   if (!route.requiredRoles || route.requiredRoles.length === 0) {
     return true; // Public route
   }
-  
+
   if (!userRole) {
     return false; // No user role, can't access protected routes
   }
-  
+
   return (route.requiredRoles as UserRole[]).includes(userRole);
 };
 
@@ -143,9 +192,14 @@ export const AppRoutes: React.FC = () => {
   return (
     <Routes>
       {routeConfigs.map((route, index) => {
-        // Wrap protected routes with ProtectedRoute component
-        const routeElement = route.requiredRoles && route.requiredRoles.length > 0 ? (
-          <ProtectedRoute 
+        // Check if route already has AdminRouteGuard or other guards embedded
+        const hasEmbeddedGuard = React.isValidElement(route.element) &&
+          (route.element.type === AdminRouteGuard ||
+            route.path.startsWith('/admin'));
+
+        // Wrap protected routes with ProtectedRoute component if no embedded guard
+        const routeElement = !hasEmbeddedGuard && route.requiredRoles && route.requiredRoles.length > 0 ? (
+          <ProtectedRoute
             requiredRoles={route.requiredRoles}
             fallbackPath="/unauthorized"
           >
@@ -163,7 +217,7 @@ export const AppRoutes: React.FC = () => {
           />
         );
       })}
-      
+
       {/* Catch-all route for 404 - must be last */}
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -2,6 +2,8 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider } from './contexts/AuthContext';
+import { SystemSettingsProvider } from './contexts/SystemSettingsContext';
+import { ToastProvider } from './contexts/ToastContext';
 import { AppRoutes } from './routes';
 
 
@@ -32,12 +34,16 @@ const theme = createTheme({
 function App() {
   return (
     <AuthProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router>
-          <AppRoutes />
-        </Router>
-      </ThemeProvider>
+      <SystemSettingsProvider>
+        <ToastProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Router>
+              <AppRoutes />
+            </Router>
+          </ThemeProvider>
+        </ToastProvider>
+      </SystemSettingsProvider>
     </AuthProvider>
   );
 }

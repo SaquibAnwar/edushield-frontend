@@ -34,6 +34,7 @@ import type {
   ParentMetrics,
   FacultyMetrics,
 } from '../types/api';
+import { dateConverter } from '../utils/dateUtils';
 import type { AuthResult } from '../types/auth';
 
 class ApiClient {
@@ -133,9 +134,24 @@ class ApiClient {
             console.error('Token refresh failed:', refreshError);
             storage.clearAll();
             
-            // Redirect to login page or emit logout event
-            window.location.href = '/';
-            return Promise.reject(refreshError);
+            // Show user-friendly message about session expiration
+            if (window.location.pathname !== '/') {
+              // Create a temporary toast to show session expired message
+              const event = new CustomEvent('sessionExpired', {
+                detail: {
+                  title: 'Session Expired',
+                  message: 'Your session has expired. Please log in again to continue.',
+                }
+              });
+              window.dispatchEvent(event);
+              
+              // Redirect to login page after a short delay
+              setTimeout(() => {
+                window.location.href = '/';
+              }, 2000);
+            }
+            
+            return Promise.reject(new Error('Your session has expired. Please log in again.'));
           }
         }
 
@@ -276,11 +292,25 @@ export class ApiService {
   }
 
   async createStudent(data: CreateStudentRequest): Promise<Student> {
-    return this.client.post<Student>('/students', data);
+    // Convert Date objects to ISO strings for backend
+    const requestData = {
+      ...data,
+      dateOfBirth: dateConverter.formatForBackend(data.dateOfBirth),
+      enrollmentDate: dateConverter.formatForBackend(data.enrollmentDate),
+    };
+    return this.client.post<Student>('/students', requestData);
   }
 
   async updateStudent(id: string, data: UpdateStudentRequest): Promise<Student> {
-    return this.client.put<Student>(`/students/${id}`, data);
+    // Convert Date objects to ISO strings for backend if they exist
+    const requestData = { ...data };
+    if (requestData.dateOfBirth instanceof Date) {
+      requestData.dateOfBirth = dateConverter.formatForBackend(requestData.dateOfBirth) as any;
+    }
+    if (requestData.enrollmentDate instanceof Date) {
+      requestData.enrollmentDate = dateConverter.formatForBackend(requestData.enrollmentDate) as any;
+    }
+    return this.client.put<Student>(`/students/${id}`, requestData);
   }
 
   async deleteStudent(id: string): Promise<void> {
@@ -294,27 +324,41 @@ export class ApiService {
   // Faculty endpoints
   async getFaculties(filters?: FacultyFilters): Promise<PaginatedResponse<Faculty>> {
     const params = this.buildQueryParams(filters);
-    return this.client.get<PaginatedResponse<Faculty>>('/faculties', { params });
+    return this.client.get<PaginatedResponse<Faculty>>('/faculty', { params });
   }
 
   async getFaculty(id: string): Promise<Faculty> {
-    return this.client.get<Faculty>(`/faculties/${id}`);
+    return this.client.get<Faculty>(`/faculty/${id}`);
   }
 
   async createFaculty(data: CreateFacultyRequest): Promise<Faculty> {
-    return this.client.post<Faculty>('/faculties', data);
+    // Convert Date objects to ISO strings for backend
+    const requestData = {
+      ...data,
+      dateOfBirth: dateConverter.formatForBackend(data.dateOfBirth),
+      hireDate: dateConverter.formatForBackend(data.hireDate),
+    };
+    return this.client.post<Faculty>('/faculty', requestData);
   }
 
   async updateFaculty(id: string, data: UpdateFacultyRequest): Promise<Faculty> {
-    return this.client.put<Faculty>(`/faculties/${id}`, data);
+    // Convert Date objects to ISO strings for backend if they exist
+    const requestData = { ...data };
+    if (requestData.dateOfBirth instanceof Date) {
+      requestData.dateOfBirth = dateConverter.formatForBackend(requestData.dateOfBirth) as any;
+    }
+    if (requestData.hireDate instanceof Date) {
+      requestData.hireDate = dateConverter.formatForBackend(requestData.hireDate) as any;
+    }
+    return this.client.put<Faculty>(`/faculty/${id}`, requestData);
   }
 
   async deleteFaculty(id: string): Promise<void> {
-    return this.client.delete<void>(`/faculties/${id}`);
+    return this.client.delete<void>(`/faculty/${id}`);
   }
 
   async bulkDeleteFaculties(ids: string[]): Promise<void> {
-    return this.client.post<void>('/faculties/bulk-delete', { ids });
+    return this.client.post<void>('/faculty/bulk-delete', { ids });
   }
 
   // Parent endpoints
@@ -328,11 +372,21 @@ export class ApiService {
   }
 
   async createParent(data: CreateParentRequest): Promise<Parent> {
-    return this.client.post<Parent>('/parents', data);
+    // Convert Date objects to ISO strings for backend
+    const requestData = {
+      ...data,
+      dateOfBirth: dateConverter.formatForBackend(data.dateOfBirth),
+    };
+    return this.client.post<Parent>('/parents', requestData);
   }
 
   async updateParent(id: string, data: UpdateParentRequest): Promise<Parent> {
-    return this.client.put<Parent>(`/parents/${id}`, data);
+    // Convert Date objects to ISO strings for backend if they exist
+    const requestData = { ...data };
+    if (requestData.dateOfBirth instanceof Date) {
+      requestData.dateOfBirth = dateConverter.formatForBackend(requestData.dateOfBirth) as any;
+    }
+    return this.client.put<Parent>(`/parents/${id}`, requestData);
   }
 
   async deleteParent(id: string): Promise<void> {
@@ -346,85 +400,111 @@ export class ApiService {
   // Student Performance endpoints
   async getStudentPerformances(filters?: PerformanceFilters): Promise<PaginatedResponse<StudentPerformance>> {
     const params = this.buildQueryParams(filters);
-    return this.client.get<PaginatedResponse<StudentPerformance>>('/performances', { params });
+    return this.client.get<PaginatedResponse<StudentPerformance>>('/student-performance', { params });
   }
 
   async getStudentPerformance(id: string): Promise<StudentPerformance> {
-    return this.client.get<StudentPerformance>(`/performances/${id}`);
+    return this.client.get<StudentPerformance>(`/student-performance/${id}`);
   }
 
   async createPerformance(data: CreatePerformanceRequest): Promise<StudentPerformance> {
-    return this.client.post<StudentPerformance>('/performances', data);
+    // Convert Date objects to ISO strings for backend if examDate is a Date
+    const requestData = { ...data };
+    if (typeof requestData.examDate !== 'string') {
+      requestData.examDate = dateConverter.formatForBackend(new Date(requestData.examDate));
+    }
+    return this.client.post<StudentPerformance>('/student-performance', requestData);
   }
 
   async updatePerformance(id: string, data: UpdatePerformanceRequest): Promise<StudentPerformance> {
-    return this.client.put<StudentPerformance>(`/performances/${id}`, data);
+    // Convert Date objects to ISO strings for backend if examDate exists and is a Date
+    const requestData = { ...data };
+    if (requestData.examDate && typeof requestData.examDate !== 'string') {
+      requestData.examDate = dateConverter.formatForBackend(new Date(requestData.examDate));
+    }
+    return this.client.put<StudentPerformance>(`/student-performance/${id}`, requestData);
   }
 
   async deletePerformance(id: string): Promise<void> {
-    return this.client.delete<void>(`/performances/${id}`);
+    return this.client.delete<void>(`/student-performance/${id}`);
   }
 
   async bulkDeletePerformances(ids: string[]): Promise<void> {
-    return this.client.post<void>('/performances/bulk-delete', { ids });
+    return this.client.post<void>('/student-performance/bulk-delete', { ids });
   }
 
   // Student Fee endpoints
   async getStudentFees(filters?: FeeFilters): Promise<PaginatedResponse<StudentFee>> {
     const params = this.buildQueryParams(filters);
-    return this.client.get<PaginatedResponse<StudentFee>>('/fees', { params });
+    return this.client.get<PaginatedResponse<StudentFee>>('/student-fees', { params });
   }
 
   async getStudentFee(id: string): Promise<StudentFee> {
-    return this.client.get<StudentFee>(`/fees/${id}`);
+    return this.client.get<StudentFee>(`/student-fees/${id}`);
   }
 
   async createFee(data: CreateFeeRequest): Promise<StudentFee> {
-    return this.client.post<StudentFee>('/fees', data);
+    // Convert Date objects to ISO strings for backend
+    const requestData = { ...data };
+    if (typeof requestData.dueDate !== 'string') {
+      requestData.dueDate = dateConverter.formatForBackend(new Date(requestData.dueDate));
+    }
+    if (requestData.lastPaymentDate && typeof requestData.lastPaymentDate !== 'string') {
+      requestData.lastPaymentDate = dateConverter.formatForBackend(new Date(requestData.lastPaymentDate));
+    }
+    return this.client.post<StudentFee>('/student-fees', requestData);
   }
 
   async updateFee(id: string, data: UpdateFeeRequest): Promise<StudentFee> {
-    return this.client.put<StudentFee>(`/fees/${id}`, data);
+    // Convert Date objects to ISO strings for backend if they exist
+    const requestData = { ...data };
+    if (requestData.dueDate && typeof requestData.dueDate !== 'string') {
+      requestData.dueDate = dateConverter.formatForBackend(new Date(requestData.dueDate));
+    }
+    if (requestData.lastPaymentDate && typeof requestData.lastPaymentDate !== 'string') {
+      requestData.lastPaymentDate = dateConverter.formatForBackend(new Date(requestData.lastPaymentDate));
+    }
+    return this.client.put<StudentFee>(`/student-fees/${id}`, requestData);
   }
 
   async deleteFee(id: string): Promise<void> {
-    return this.client.delete<void>(`/fees/${id}`);
+    return this.client.delete<void>(`/student-fees/${id}`);
   }
 
   async bulkDeleteFees(ids: string[]): Promise<void> {
-    return this.client.post<void>('/fees/bulk-delete', { ids });
+    return this.client.post<void>('/student-fees/bulk-delete', { ids });
   }
 
   // Faculty Assignment endpoints
   async assignFacultyToStudent(data: AssignFacultyToStudentRequest): Promise<FacultyAssignment> {
-    return this.client.post<FacultyAssignment>('/faculty-assignments', data);
+    return this.client.post<FacultyAssignment>('/faculty-student-assignments', data);
   }
 
   async getFacultyAssignments(studentId?: string, facultyId?: string): Promise<FacultyAssignment[]> {
     const params: any = {};
     if (studentId) params.studentId = studentId;
     if (facultyId) params.facultyId = facultyId;
-    return this.client.get<FacultyAssignment[]>('/faculty-assignments', { params });
+    return this.client.get<FacultyAssignment[]>('/faculty-student-assignments', { params });
   }
 
   async deleteFacultyAssignment(id: string): Promise<void> {
-    return this.client.delete<void>(`/faculty-assignments/${id}`);
+    return this.client.delete<void>(`/faculty-student-assignments/${id}`);
   }
 
   // Parent Student relationship endpoints
   async assignParentToStudent(data: AssignParentToStudentRequest): Promise<ParentStudent> {
-    return this.client.post<ParentStudent>('/parent-students', data);
+    return this.client.post<ParentStudent>('/parent-student-assignments', data);
   }
 
   async getParentStudents(parentId?: string, studentId?: string): Promise<ParentStudent[]> {
     const params: any = {};
     if (parentId) params.parentId = parentId;
     if (studentId) params.studentId = studentId;
-    return this.client.get<ParentStudent[]>('/parent-students', { params });
+    return this.client.get<ParentStudent[]>('/parent-student-assignments', { params });
   }
 
   async deleteParentStudent(id: string): Promise<void> {
-    return this.client.delete<void>(`/parent-students/${id}`);
+    return this.client.delete<void>(`/parent-student-assignments/${id}`);
   }
 
   // Dashboard metrics endpoints
