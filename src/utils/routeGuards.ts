@@ -105,6 +105,83 @@ export const isRouteAccessible = (path: string, userRole: UserRole): boolean => 
 };
 
 /**
+ * Check if user has admin access specifically
+ */
+export const hasAdminAccess = (userRole: UserRole | undefined): boolean => {
+  return userRole === UserRole.Admin;
+};
+
+/**
+ * Check if user can access CRUD forms (admin-only functionality)
+ */
+export const canAccessCRUDForms = (userRole: UserRole | undefined): boolean => {
+  return hasAdminAccess(userRole);
+};
+
+/**
+ * Validate admin permissions with comprehensive checks
+ */
+export const validateAdminPermissions = (
+  userRole: UserRole | undefined,
+  isAuthenticated: boolean,
+  isActive: boolean = true
+): { 
+  hasAccess: boolean; 
+  reason?: string; 
+  redirectTo?: string 
+} => {
+  // Check authentication first
+  if (!isAuthenticated) {
+    return {
+      hasAccess: false,
+      reason: 'User is not authenticated',
+      redirectTo: '/'
+    };
+  }
+
+  // Check if user role exists
+  if (!userRole) {
+    return {
+      hasAccess: false,
+      reason: 'User role is not defined',
+      redirectTo: '/'
+    };
+  }
+
+  // Check admin role
+  if (!hasAdminAccess(userRole)) {
+    return {
+      hasAccess: false,
+      reason: 'User does not have admin privileges',
+      redirectTo: getDefaultDashboardPath(userRole)
+    };
+  }
+
+  // Check account status
+  if (!isActive) {
+    return {
+      hasAccess: false,
+      reason: 'Admin account is inactive',
+      redirectTo: '/'
+    };
+  }
+
+  return { hasAccess: true };
+};
+
+/**
+ * Check if a route is admin-only
+ */
+export const isAdminOnlyRoute = (path: string): boolean => {
+  const adminRoutes = [
+    '/admin/users',
+    '/admin/management'
+  ];
+  
+  return adminRoutes.some(route => path.startsWith(route));
+};
+
+/**
  * Validate route access and return appropriate redirect
  */
 export const validateRouteAccess = (

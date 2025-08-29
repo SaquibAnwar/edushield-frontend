@@ -1,0 +1,1 @@
+export { AdminRouteGuard, default } from './AdminRouteGuard';

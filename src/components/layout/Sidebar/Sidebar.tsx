@@ -23,9 +23,11 @@ import {
   Payment as PaymentIcon,
   Grade as GradeIcon,
   FamilyRestroom as FamilyIcon,
-  AccountCircle as ProfileIcon
+  AccountCircle as ProfileIcon,
+  BugReport as TestIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../../hooks/useAuth';
+import { useSystemSettings } from '../../../contexts/SystemSettingsContext';
 import { UserRole } from '../../../types/auth';
 
 export interface SidebarProps {
@@ -49,6 +51,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   userRole
 }) => {
   const { logout, getDisplayName } = useAuth();
+  const { settings } = useSystemSettings();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -100,17 +103,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }
     ];
 
+    // Test components item - only show if enabled by admin
+    const shouldShowTestComponents = settings?.testComponentsEnabled;
+    
+    const testItem: MenuItem | null = shouldShowTestComponents ? {
+      label: 'Test Components',
+      icon: <TestIcon />,
+      path: '/test-components',
+      onClick: () => handleNavigation('/test-components')
+    } : null;
+
     switch (userRole) {
       case UserRole.Admin:
-        return [
+        const adminItems = [
           ...commonItems,
           { label: '', icon: null, divider: true },
           {
             label: 'Manage Users',
             icon: <PeopleIcon />,
             path: '/admin/users',
-            onClick: () => handleNavigation('/admin/users'),
-            disabled: true // Will be enabled in future tasks
+            onClick: () => handleNavigation('/admin/users')
           },
           {
             label: 'Academic Management',
@@ -130,13 +142,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
             label: 'System Settings',
             icon: <SettingsIcon />,
             path: '/admin/settings',
-            onClick: () => handleNavigation('/admin/settings'),
-            disabled: true // Will be enabled in future tasks
+            onClick: () => handleNavigation('/admin/settings')
           }
         ];
+        
+        if (testItem) {
+          adminItems.push({ label: '', icon: null, divider: true }, testItem);
+        }
+        
+        return adminItems;
 
       case UserRole.Faculty:
-        return [
+        const facultyItems = [
           ...commonItems,
           { label: '', icon: null, divider: true },
           {
@@ -168,9 +185,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             disabled: true // Will be enabled in future tasks
           }
         ];
+        
+        if (testItem) {
+          facultyItems.push({ label: '', icon: null, divider: true }, testItem);
+        }
+        
+        return facultyItems;
 
       case UserRole.Parent:
-        return [
+        const parentItems = [
           ...commonItems,
           { label: '', icon: null, divider: true },
           {
@@ -202,9 +225,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             disabled: true // Will be enabled in future tasks
           }
         ];
+        
+        if (testItem) {
+          parentItems.push({ label: '', icon: null, divider: true }, testItem);
+        }
+        
+        return parentItems;
 
       case UserRole.Student:
-        return [
+        const studentItems = [
           ...commonItems,
           { label: '', icon: null, divider: true },
           {
@@ -236,9 +265,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             disabled: true // Will be enabled in future tasks
           }
         ];
+        
+        if (testItem) {
+          studentItems.push({ label: '', icon: null, divider: true }, testItem);
+        }
+        
+        return studentItems;
 
       default:
-        return commonItems;
+        const defaultItems = [...commonItems];
+        if (testItem) {
+          defaultItems.push({ label: '', icon: null, divider: true }, testItem);
+        }
+        return defaultItems;
     }
   };
 

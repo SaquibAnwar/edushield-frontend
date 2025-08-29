@@ -11,7 +11,7 @@ export interface FormState<T> {
   touched: Partial<Record<keyof T, boolean>>;
 }
 
-// Student form data
+// Student form data - aligned with backend CreateStudentRequest
 export interface StudentFormData {
   firstName: string;
   lastName: string;
@@ -20,15 +20,14 @@ export interface StudentFormData {
   dateOfBirth: string;
   address: string;
   gender: Gender;
-  rollNumber: string;
   enrollmentDate: string;
-  status: StudentStatus;
-  grade: string;
-  section: string;
-  parentId: string;
+  grade?: string;
+  section?: string;
+  parentId?: string;
+  facultyIds: string[];
 }
 
-// Faculty form data
+// Faculty form data - aligned with backend CreateFacultyRequest
 export interface FacultyFormData {
   firstName: string;
   lastName: string;
@@ -39,35 +38,33 @@ export interface FacultyFormData {
   gender: Gender;
   department: string;
   subject: string;
-  employeeId: string;
   hireDate: string;
-  isActive: boolean;
+  userId?: string;
 }
 
-// Parent form data
+// Parent form data - aligned with backend CreateParentRequest
 export interface ParentFormData {
   firstName: string;
   lastName: string;
   email: string;
   phoneNumber: string;
-  alternatePhoneNumber: string;
+  alternatePhoneNumber?: string;
   dateOfBirth: string;
   address: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
   gender: Gender;
-  occupation: string;
-  employer: string;
-  workPhone: string;
-  emergencyContactName: string;
-  emergencyContactPhone: string;
-  emergencyContactRelationship: string;
+  occupation?: string;
+  employer?: string;
+  workPhone?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelationship?: string;
   parentType: ParentType;
   isEmergencyContact: boolean;
   isAuthorizedToPickup: boolean;
-  isActive: boolean;
 }
 
 // Performance form data

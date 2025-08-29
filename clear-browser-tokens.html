@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Browser Cache & Tokens</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .danger {
+            background: #dc3545;
+        }
+        .danger:hover {
+            background: #c82333;
+        }
+        .success {
+            background: #28a745;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Clear Browser Cache & Tokens</h1>
+        
+        <div class="section">
+            <h3>🔑 Authentication Tokens</h3>
+            <p>Clear all stored authentication tokens and session data:</p>
+            <button class="button danger" onclick="clearAuthTokens()">Clear Auth Tokens</button>
+        </div>
+
+        <div class="section">
+            <h3>💾 Browser Storage</h3>
+            <p>Clear localStorage, sessionStorage, and cookies:</p>
+            <button class="button" onclick="clearLocalStorage()">Clear localStorage</button>
+            <button class="button" onclick="clearSessionStorage()">Clear sessionStorage</button>
+            <button class="button" onclick="clearCookies()">Clear Cookies</button>
+        </div>
+
+        <div class="section">
+            <h3>🗄️ Database Storage</h3>
+            <p>Clear IndexedDB and WebSQL databases:</p>
+            <button class="button" onclick="clearIndexedDB()">Clear IndexedDB</button>
+            <button class="button" onclick="clearWebSQL()">Clear WebSQL</button>
+        </div>
+
+        <div class="section">
+            <h3>🌐 Cache Storage</h3>
+            <p>Clear service worker caches and application cache:</p>
+            <button class="button" onclick="clearCacheStorage()">Clear Cache Storage</button>
+            <button class="button" onclick="clearApplicationCache()">Clear App Cache</button>
+        </div>
+
+        <div class="section">
+            <h3>🚨 Nuclear Option</h3>
+            <p>Clear everything at once:</p>
+            <button class="button danger" onclick="clearEverything()">Clear All Data</button>
+        </div>
+
+        <div class="section">
+            <h3>📋 Log Output</h3>
+            <div id="log" class="log">Ready to clear cache and tokens...\n</div>
+            <button class="button" onclick="clearLog()">Clear Log</button>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = 'Log cleared...\n';
+        }
+
+        async function clearAuthTokens() {
+            log('🔑 Clearing authentication tokens...');
+            
+            // Common token keys used in applications
+            const tokenKeys = [
+                'authToken',
+                'accessToken',
+                'refreshToken',
+                'jwt',
+                'token',
+                'auth',
+                'user',
+                'session',
+                'credentials',
+                'bearer',
+                'authorization',
+                'edushield_token',
+                'edushield_auth',
+                'edushield_user'
+            ];
+
+            let clearedCount = 0;
+
+            // Clear from localStorage
+            tokenKeys.forEach(key => {
+                if (localStorage.getItem(key)) {
+                    localStorage.removeItem(key);
+                    clearedCount++;
+                    log(`  ✅ Removed ${key} from localStorage`);
+                }
+            });
+
+            // Clear from sessionStorage
+            tokenKeys.forEach(key => {
+                if (sessionStorage.getItem(key)) {
+                    sessionStorage.removeItem(key);
+                    clearedCount++;
+                    log(`  ✅ Removed ${key} from sessionStorage`);
+                }
+            });
+
+            // Clear auth-related cookies
+            const authCookies = document.cookie.split(';').filter(cookie => {
+                const name = cookie.split('=')[0].trim().toLowerCase();
+                return tokenKeys.some(key => name.includes(key.toLowerCase()));
+            });
+
+            authCookies.forEach(cookie => {
+                const name = cookie.split('=')[0].trim();
+                document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                clearedCount++;
+                log(`  ✅ Removed cookie: ${name}`);
+            });
+
+            log(`✅ Cleared ${clearedCount} authentication tokens`);
+        }
+
+        function clearLocalStorage() {
+            log('💾 Clearing localStorage...');
+            const count = localStorage.length;
+            localStorage.clear();
+            log(`✅ Cleared ${count} localStorage items`);
+        }
+
+        function clearSessionStorage() {
+            log('💾 Clearing sessionStorage...');
+            const count = sessionStorage.length;
+            sessionStorage.clear();
+            log(`✅ Cleared ${count} sessionStorage items`);
+        }
+
+        function clearCookies() {
+            log('🍪 Clearing cookies...');
+            const cookies = document.cookie.split(';');
+            let count = 0;
+            
+            cookies.forEach(cookie => {
+                const eqPos = cookie.indexOf('=');
+                const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+                if (name) {
+                    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+                    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${window.location.hostname};`;
+                    count++;
+                }
+            });
+            
+            log(`✅ Cleared ${count} cookies`);
+        }
+
+        async function clearIndexedDB() {
+            log('🗄️ Clearing IndexedDB...');
+            
+            if ('indexedDB' in window) {
+                try {
+                    const databases = await indexedDB.databases();
+                    let count = 0;
+                    
+                    for (const db of databases) {
+                        if (db.name) {
+                            indexedDB.deleteDatabase(db.name);
+                            count++;
+                            log(`  ✅ Deleted database: ${db.name}`);
+                        }
+                    }
+                    
+                    log(`✅ Cleared ${count} IndexedDB databases`);
+                } catch (error) {
+                    log(`❌ Error clearing IndexedDB: ${error.message}`);
+                }
+            } else {
+                log('ℹ️ IndexedDB not supported');
+            }
+        }
+
+        function clearWebSQL() {
+            log('🗄️ Clearing WebSQL...');
+            
+            if ('openDatabase' in window) {
+                try {
+                    // WebSQL is deprecated, but clear if available
+                    log('ℹ️ WebSQL is deprecated and cannot be fully cleared programmatically');
+                } catch (error) {
+                    log(`❌ Error with WebSQL: ${error.message}`);
+                }
+            } else {
+                log('ℹ️ WebSQL not supported');
+            }
+        }
+
+        async function clearCacheStorage() {
+            log('🌐 Clearing Cache Storage...');
+            
+            if ('caches' in window) {
+                try {
+                    const cacheNames = await caches.keys();
+                    let count = 0;
+                    
+                    for (const cacheName of cacheNames) {
+                        await caches.delete(cacheName);
+                        count++;
+                        log(`  ✅ Deleted cache: ${cacheName}`);
+                    }
+                    
+                    log(`✅ Cleared ${count} cache storages`);
+                } catch (error) {
+                    log(`❌ Error clearing cache storage: ${error.message}`);
+                }
+            } else {
+                log('ℹ️ Cache Storage not supported');
+            }
+        }
+
+        function clearApplicationCache() {
+            log('🌐 Clearing Application Cache...');
+            
+            if ('applicationCache' in window) {
+                try {
+                    window.applicationCache.update();
+                    log('✅ Application cache updated');
+                } catch (error) {
+                    log(`❌ Error clearing application cache: ${error.message}`);
+                }
+            } else {
+                log('ℹ️ Application Cache not supported (deprecated)');
+            }
+        }
+
+        async function clearEverything() {
+            log('🚨 NUCLEAR OPTION: Clearing everything...');
+            
+            await clearAuthTokens();
+            clearLocalStorage();
+            clearSessionStorage();
+            clearCookies();
+            await clearIndexedDB();
+            clearWebSQL();
+            await clearCacheStorage();
+            clearApplicationCache();
+            
+            log('💥 Everything cleared! Please refresh the page.');
+            
+            // Optional: Reload the page after clearing
+            setTimeout(() => {
+                if (confirm('All data cleared! Reload the page now?')) {
+                    window.location.reload(true);
+                }
+            }, 2000);
+        }
+
+        // Auto-clear on page load if URL contains ?clear=true
+        if (window.location.search.includes('clear=true')) {
+            log('🚀 Auto-clearing detected from URL parameter...');
+            setTimeout(clearEverything, 1000);
+        }
+    </script>
+</body>
+</html>
