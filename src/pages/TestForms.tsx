@@ -34,9 +34,9 @@ const TestForms: React.FC = () => {
     setTabValue(newValue);
   };
 
-  const addTestResult = (result: string) => {
-    setTestResults(prev => [...prev, `${new Date().toLocaleTimeString()}: ${result}`]);
-  };
+  // const addTestResult = (result: string) => {
+  //   setTestResults(prev => [...prev, `${new Date().toLocaleTimeString()}: ${result}`]);
+  // };
 
   const clearResults = () => {
     setTestResults([]);
