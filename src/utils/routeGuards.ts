@@ -174,8 +174,7 @@ export const validateAdminPermissions = (
  */
 export const isAdminOnlyRoute = (path: string): boolean => {
   const adminRoutes = [
-    '/admin/users',
-    '/admin/management'
+    '/admin/users'
   ];
   
   return adminRoutes.some(route => path.startsWith(route));
