@@ -297,7 +297,7 @@ export const AdminDashboard: React.FC = () => {
                 transition: 'transform 0.2s ease-in-out',
                 '&:hover': { transform: 'translateY(-2px)' }
               }}
-              onClick={() => navigate('/admin/management')}
+              onClick={() => navigate('/admin/users')}
             >
               <CardContent sx={{ textAlign: 'center', py: 4 }}>
                 <PeopleIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />

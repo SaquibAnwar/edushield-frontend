@@ -121,8 +121,7 @@ export class PermissionService {
         const adminRoutes = [
             '/admin',
             '/admin/dashboard',
-            '/admin/users',
-            '/admin/management'
+            '/admin/users'
         ];
 
         return adminRoutes.some(route =>
