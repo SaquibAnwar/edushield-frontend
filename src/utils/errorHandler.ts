@@ -22,6 +22,14 @@ export class ErrorHandler {
    * Parse API error response and extract meaningful error information
    */
   static parseApiError(error: any): ApiError {
+    // Handle null/undefined errors
+    if (!error) {
+      return {
+        message: 'An unknown error occurred',
+        code: 'NULL_ERROR',
+      };
+    }
+
     // Handle Axios errors
     if (error.isAxiosError || error.response) {
       const axiosError = error as AxiosError;
@@ -117,6 +125,10 @@ export class ErrorHandler {
    * Parse validation errors from backend response
    */
   static parseValidationErrors(error: any): ValidationError[] {
+    if (!error) {
+      return [];
+    }
+    
     const apiError = this.parseApiError(error);
     const validationErrors: ValidationError[] = [];
 
@@ -193,6 +205,10 @@ export class ErrorHandler {
    * Check if error is a network/connectivity issue
    */
   static isNetworkError(error: any): boolean {
+    if (!error) {
+      return false;
+    }
+    
     if (error.isAxiosError) {
       return !error.response || error.code === 'ECONNABORTED' || error.message === 'Network Error';
     }
@@ -203,6 +219,7 @@ export class ErrorHandler {
    * Check if error is an authentication error
    */
   static isAuthError(error: any): boolean {
+    if (!error) return false;
     const apiError = this.parseApiError(error);
     return apiError.status === 401;
   }
@@ -211,6 +228,7 @@ export class ErrorHandler {
    * Check if error is a permission error
    */
   static isPermissionError(error: any): boolean {
+    if (!error) return false;
     const apiError = this.parseApiError(error);
     return apiError.status === 403;
   }
@@ -219,6 +237,7 @@ export class ErrorHandler {
    * Check if error is a validation error
    */
   static isValidationError(error: any): boolean {
+    if (!error) return false;
     const apiError = this.parseApiError(error);
     return apiError.status === 400 || apiError.status === 422;
   }
@@ -227,6 +246,11 @@ export class ErrorHandler {
    * Get retry-able error types
    */
   static isRetryableError(error: any): boolean {
+    // Handle null/undefined errors
+    if (!error) {
+      return false;
+    }
+    
     const apiError = this.parseApiError(error);
     const retryableStatuses = [408, 429, 500, 502, 503, 504];
     return this.isNetworkError(error) || (apiError.status ? retryableStatuses.includes(apiError.status) : false);
@@ -236,6 +260,13 @@ export class ErrorHandler {
    * Format error for display to users
    */
   static formatErrorForDisplay(error: any): { title: string; message: string } {
+    if (!error) {
+      return {
+        title: 'Error',
+        message: 'An unknown error occurred',
+      };
+    }
+    
     const apiError = this.parseApiError(error);
 
     if (this.isAuthError(error)) {
@@ -293,14 +324,22 @@ export const useErrorHandler = () => {
   };
 
   const handleValidationErrors = (error: any) => {
+    if (!error) return [];
     return ErrorHandler.parseValidationErrors(error);
   };
 
   const isRetryable = (error: any) => {
+    if (!error) return false;
     return ErrorHandler.isRetryableError(error);
   };
 
   const formatForDisplay = (error: any) => {
+    if (!error) {
+      return {
+        title: 'Error',
+        message: 'An unknown error occurred',
+      };
+    }
     return ErrorHandler.formatErrorForDisplay(error);
   };
 
