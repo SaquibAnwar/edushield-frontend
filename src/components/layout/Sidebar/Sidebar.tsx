@@ -125,6 +125,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick: () => handleNavigation('/admin/users')
           },
           {
+            label: 'Student Management',
+            icon: <SchoolIcon />,
+            path: '/admin/students',
+            onClick: () => handleNavigation('/admin/students')
+          },
+          {
             label: 'Academic Management',
             icon: <SchoolIcon />,
             path: '/admin/academic',
