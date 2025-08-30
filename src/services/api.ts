@@ -282,9 +282,9 @@ export class ApiService {
   }
 
   // Student endpoints
-  async getStudents(filters?: StudentFilters): Promise<PaginatedResponse<Student>> {
+  async getStudents(filters?: StudentFilters): Promise<Student[]> {
     const params = this.buildQueryParams(filters);
-    return this.client.get<PaginatedResponse<Student>>('/students', { params });
+    return this.client.get<Student[]>('/students', { params });
   }
 
   async getStudent(id: string): Promise<Student> {
@@ -322,9 +322,9 @@ export class ApiService {
   }
 
   // Faculty endpoints
-  async getFaculties(filters?: FacultyFilters): Promise<PaginatedResponse<Faculty>> {
+  async getFaculties(filters?: FacultyFilters): Promise<Faculty[]> {
     const params = this.buildQueryParams(filters);
-    return this.client.get<PaginatedResponse<Faculty>>('/faculty', { params });
+    return this.client.get<Faculty[]>('/faculty', { params });
   }
 
   async getFaculty(id: string): Promise<Faculty> {
@@ -362,9 +362,9 @@ export class ApiService {
   }
 
   // Parent endpoints
-  async getParents(filters?: ParentFilters): Promise<PaginatedResponse<Parent>> {
+  async getParents(filters?: ParentFilters): Promise<Parent[]> {
     const params = this.buildQueryParams(filters);
-    return this.client.get<PaginatedResponse<Parent>>('/parents', { params });
+    return this.client.get<Parent[]>('/parents', { params });
   }
 
   async getParent(id: string): Promise<Parent> {

@@ -6,10 +6,12 @@ export enum Gender {
 }
 
 export enum StudentStatus {
-  ACTIVE = 'Active',
-  INACTIVE = 'Inactive',
-  GRADUATED = 'Graduated',
-  SUSPENDED = 'Suspended',
+  ACTIVE = 0,
+  INACTIVE = 1,
+  SUSPENDED = 2,
+  GRADUATED = 3,
+  TRANSFERRED = 4,
+  WITHDRAWN = 5,
 }
 
 export enum ExamType {

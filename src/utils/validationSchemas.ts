@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { StudentStatus, ExamType, FeeType, PaymentStatus } from '../types/user';
+import { ExamType, FeeType, PaymentStatus } from '../types/user';
 
 // Common validation patterns
 const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
@@ -76,6 +76,11 @@ export const studentFormSchema = yup.object({
     .of(yup.string().required('Faculty ID is required'))
     .default([])
     .optional(),
+  
+  status: yup
+    .number()
+    .optional()
+    .oneOf([0, 1, 2, 3, 4, 5], 'Please select a valid status'),
 });
 
 // Faculty form validation schema - matches CreateFacultyRequest
@@ -394,9 +399,9 @@ export const searchFormSchema = yup.object({
   
   filters: yup.object({
     status: yup
-      .string()
+      .number()
       .optional()
-      .oneOf([...Object.values(StudentStatus), ''], 'Please select a valid status'),
+      .oneOf([0, 1, 2, 3, 4, 5], 'Please select a valid status'),
     
     grade: yup
       .string()

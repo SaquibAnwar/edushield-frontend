@@ -25,6 +25,7 @@ export interface StudentFormData {
   section?: string;
   parentId?: string;
   facultyIds: string[];
+  status?: StudentStatus;
 }
 
 // Faculty form data - aligned with backend CreateFacultyRequest

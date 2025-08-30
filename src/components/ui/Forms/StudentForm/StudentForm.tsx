@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -20,12 +20,13 @@ import { LoadingSpinner } from '../../LoadingSpinner';
 import { FormErrorHandler } from '../../FormErrorHandler';
 import { SuccessFeedback } from '../../SuccessFeedback';
 import { studentFormSchema } from '../../../../utils/validationSchemas';
-import { Gender } from '../../../../types/user';
+import { Gender, StudentStatus } from '../../../../types/user';
 import type { StudentFormData } from '../../../../types/forms';
 import type { FormProps } from '../../../../types/components';
 import { convertFormDatesToDateTime } from '../../../../utils/dateUtils';
 import { useErrorHandler } from '../../../../utils/errorHandler';
 import { useToast } from '../../../../contexts/ToastContext';
+import { getStudentStatusOptions, getGenderOptions } from '../../../../utils/enumUtils';
 
 interface StudentFormProps extends FormProps<StudentFormData> {
   parents?: Array<{ id: string; fullName: string }>;
@@ -56,14 +57,25 @@ const StudentForm: React.FC<StudentFormProps> = ({
   const { handleError, isRetryable, formatForDisplay } = useErrorHandler();
   const { showSuccess: showSuccessToast, showError: showErrorToast } = useToast();
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting, isDirty },
-  } = useForm<StudentFormData>({
-    resolver: yupResolver(studentFormSchema) as any,
-    defaultValues: initialData || {
+  // Helper function to format date for HTML date input (YYYY-MM-DD)
+  const formatDateForInput = (dateValue: string | Date | undefined): string => {
+    if (!dateValue) return '';
+    
+    try {
+      const date = new Date(dateValue);
+      if (isNaN(date.getTime())) return '';
+      
+      // Format as YYYY-MM-DD for HTML date input
+      return date.toISOString().split('T')[0];
+    } catch (error) {
+      console.warn('Error formatting date:', dateValue, error);
+      return '';
+    }
+  };
+
+  // Ensure proper default values for form fields
+  const getDefaultValues = (): StudentFormData => {
+    const defaults: StudentFormData = {
       firstName: '',
       lastName: '',
       email: '',
@@ -72,13 +84,49 @@ const StudentForm: React.FC<StudentFormProps> = ({
       address: '',
       gender: Gender.MALE,
       enrollmentDate: new Date().toISOString().split('T')[0],
-      grade: undefined,
-      section: undefined,
-      parentId: undefined,
+      grade: '',
+      section: '',
+      parentId: '',
       facultyIds: [],
-    },
+      status: StudentStatus.ACTIVE,
+    };
+
+    if (initialData) {
+      return {
+        ...defaults,
+        ...initialData,
+        // Ensure these fields are never null/undefined
+        grade: initialData.grade || '',
+        section: initialData.section || '',
+        parentId: initialData.parentId || '',
+        facultyIds: Array.isArray(initialData.facultyIds) ? initialData.facultyIds : [],
+        status: initialData.status !== undefined ? initialData.status : StudentStatus.ACTIVE,
+        // Format dates properly for HTML date inputs
+        dateOfBirth: formatDateForInput(initialData.dateOfBirth),
+        enrollmentDate: formatDateForInput(initialData.enrollmentDate),
+      };
+    }
+
+    return defaults;
+  };
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm<StudentFormData>({
+    resolver: yupResolver(studentFormSchema) as any,
+    defaultValues: getDefaultValues(),
     mode: 'onChange',
   });
+
+  // Reset form when initialData changes (for edit mode)
+  useEffect(() => {
+    if (initialData) {
+      reset(getDefaultValues());
+    }
+  }, [initialData, reset]);
 
   const handleFormSubmit = async (data: StudentFormData) => {
     try {
@@ -91,11 +139,6 @@ const StudentForm: React.FC<StudentFormProps> = ({
       
       // Show success feedback
       setShowSuccess(true);
-      const actionText = mode === 'edit' ? 'updated' : 'created';
-      showSuccessToast(
-        `Student ${actionText} successfully`,
-        `${data.firstName} ${data.lastName} has been ${actionText}.`
-      );
       
       // Reset form if creating new student
       if (mode === 'create') {
@@ -254,6 +297,7 @@ const StudentForm: React.FC<StudentFormProps> = ({
               render={({ field }) => (
                 <TextField
                   {...field}
+                  value={field.value || ''}
                   label="Date of Birth"
                   type="date"
                   fullWidth
@@ -275,9 +319,11 @@ const StudentForm: React.FC<StudentFormProps> = ({
                 <FormControl fullWidth error={!!errors.gender} disabled={isFormDisabled}>
                   <InputLabel>Gender *</InputLabel>
                   <Select {...field} label="Gender *">
-                    <MenuItem value={Gender.MALE}>Male</MenuItem>
-                    <MenuItem value={Gender.FEMALE}>Female</MenuItem>
-                    <MenuItem value={Gender.OTHER}>Other</MenuItem>
+                    {getGenderOptions().map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                   {errors.gender && (
                     <FormHelperText>{errors.gender.message}</FormHelperText>
@@ -321,6 +367,7 @@ const StudentForm: React.FC<StudentFormProps> = ({
               render={({ field }) => (
                 <TextField
                   {...field}
+                  value={field.value || ''}
                   label="Enrollment Date"
                   type="date"
                   fullWidth
@@ -341,6 +388,7 @@ const StudentForm: React.FC<StudentFormProps> = ({
               render={({ field }) => (
                 <TextField
                   {...field}
+                  value={field.value || ''}
                   label="Grade"
                   fullWidth
                   error={!!errors.grade}
@@ -358,6 +406,7 @@ const StudentForm: React.FC<StudentFormProps> = ({
               render={({ field }) => (
                 <TextField
                   {...field}
+                  value={field.value || ''}
                   label="Section"
                   fullWidth
                   error={!!errors.section}
@@ -370,12 +419,42 @@ const StudentForm: React.FC<StudentFormProps> = ({
           
           <Grid item xs={12} sm={6}>
             <Controller
+              name="status"
+              control={control}
+              render={({ field }) => (
+                <FormControl fullWidth error={!!errors.status} disabled={isFormDisabled}>
+                  <InputLabel>Status *</InputLabel>
+                  <Select 
+                    {...field} 
+                    value={field.value !== undefined ? field.value : StudentStatus.ACTIVE}
+                    label="Status *"
+                  >
+                    {getStudentStatusOptions().map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {errors.status && (
+                    <FormHelperText>{errors.status.message}</FormHelperText>
+                  )}
+                </FormControl>
+              )}
+            />
+          </Grid>
+          
+          <Grid item xs={12} sm={6}>
+            <Controller
               name="parentId"
               control={control}
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.parentId} disabled={isFormDisabled}>
                   <InputLabel>Parent</InputLabel>
-                  <Select {...field} label="Parent">
+                  <Select 
+                    {...field} 
+                    value={field.value || ''}
+                    label="Parent"
+                  >
                     <MenuItem value="">
                       <em>Select a parent</em>
                     </MenuItem>
@@ -402,12 +481,13 @@ const StudentForm: React.FC<StudentFormProps> = ({
                   <InputLabel>Assigned Faculty</InputLabel>
                   <Select
                     {...field}
+                    value={Array.isArray(field.value) ? field.value : []}
                     multiple
                     label="Assigned Faculty"
                     input={<OutlinedInput label="Assigned Faculty" />}
                     renderValue={(selected) => (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {(selected as string[]).map((value) => {
+                        {(Array.isArray(selected) ? selected : []).map((value) => {
                           const faculty = faculties.find(f => f.id === value);
                           return (
                             <Chip key={value} label={faculty?.fullName || value} size="small" />

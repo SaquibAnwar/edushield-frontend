@@ -97,17 +97,17 @@ export const AdminManagement: React.FC = () => {
         case 0: // Students
           setStudentsLoading(true);
           const studentsResponse = await apiService.getStudents();
-          setStudents(studentsResponse.data);
+          setStudents(studentsResponse); // Direct array response
           break;
         case 1: // Faculty
           setFacultiesLoading(true);
           const facultiesResponse = await apiService.getFaculties();
-          setFaculties(facultiesResponse.data);
+          setFaculties(facultiesResponse); // Direct array response
           break;
         case 2: // Parents
           setParentsLoading(true);
           const parentsResponse = await apiService.getParents();
-          setParents(parentsResponse.data);
+          setParents(parentsResponse); // Direct array response
           break;
       }
     } catch (error) {

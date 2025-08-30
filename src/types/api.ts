@@ -26,6 +26,7 @@ export interface PaginatedResponse<T> {
 export interface StudentFilters {
   search?: string;
   status?: StudentStatus;
+  gender?: Gender;
   grade?: string;
   section?: string;
   parentId?: string;

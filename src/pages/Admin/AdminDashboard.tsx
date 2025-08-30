@@ -318,6 +318,27 @@ export const AdminDashboard: React.FC = () => {
                 transition: 'transform 0.2s ease-in-out',
                 '&:hover': { transform: 'translateY(-2px)' }
               }}
+              onClick={() => navigate('/admin/students')}
+            >
+              <CardContent sx={{ textAlign: 'center', py: 4 }}>
+                <SchoolIcon sx={{ fontSize: 48, color: 'success.main', mb: 2 }} />
+                <Typography variant="h6" gutterBottom>
+                  Student Management
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Comprehensive student CRUD operations
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <Card 
+              sx={{ 
+                cursor: 'pointer',
+                transition: 'transform 0.2s ease-in-out',
+                '&:hover': { transform: 'translateY(-2px)' }
+              }}
               onClick={() => navigate('/admin/settings')}
             >
               <CardContent sx={{ textAlign: 'center', py: 4 }}>
@@ -347,26 +368,6 @@ export const AdminDashboard: React.FC = () => {
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Generate analytics reports
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <Card 
-              sx={{ 
-                cursor: 'pointer',
-                transition: 'transform 0.2s ease-in-out',
-                '&:hover': { transform: 'translateY(-2px)' }
-              }}
-            >
-              <CardContent sx={{ textAlign: 'center', py: 4 }}>
-                <SchoolIcon sx={{ fontSize: 48, color: 'success.main', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Academic
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Manage courses and schedules
                 </Typography>
               </CardContent>
             </Card>
