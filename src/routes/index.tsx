@@ -11,7 +11,7 @@ import { Home } from '../pages/Home';
 import { AdminDashboard } from '../pages/Admin';
 import { AdminManagement } from '../pages/Admin/AdminManagement';
 import { AdminSettings } from '../pages/Admin/AdminSettings';
-import { StudentManagement } from '../components/admin';
+import { StudentManagement, StudentDataManagement } from '../components/admin';
 import { StudentDashboard } from '../pages/Student';
 import { ParentDashboard } from '../pages/Parent';
 import { FacultyDashboard } from '../pages/Faculty';
@@ -114,6 +114,17 @@ export const routeConfigs: RouteConfig[] = [
     requiredRoles: ROUTE_PERMISSIONS.ADMIN_ONLY,
     exact: true,
     description: 'Admin student management with comprehensive CRUD operations'
+  },
+  {
+    path: '/admin/student-data',
+    element: (
+      <AdminRouteGuard>
+        <StudentDataManagement />
+      </AdminRouteGuard>
+    ),
+    requiredRoles: ROUTE_PERMISSIONS.ADMIN_ONLY,
+    exact: true,
+    description: 'Admin student data management - performance, fees, and assignments'
   },
 
   // Student routes

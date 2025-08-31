@@ -69,28 +69,71 @@ export const getParentTypeDisplay = (parentType: ParentType): string => {
 
 // Exam Type display utilities
 export const getExamTypeDisplay = (examType: ExamType): string => {
-  return examType; // Already string values
+  switch (examType) {
+    case ExamType.UnitTest:
+      return 'Unit Test';
+    case ExamType.MidTerm:
+      return 'Mid-Term';
+    case ExamType.Final:
+      return 'Final';
+    case ExamType.Assignment:
+      return 'Assignment';
+    case ExamType.Laboratory:
+      return 'Laboratory';
+    case ExamType.Presentation:
+      return 'Presentation';
+    case ExamType.ContinuousAssessment:
+      return 'Continuous Assessment';
+    case ExamType.Other:
+      return 'Other';
+    default:
+      return 'Unknown';
+  }
 };
 
 // Fee Type display utilities
 export const getFeeTypeDisplay = (feeType: FeeType): string => {
-  return feeType; // Already string values
+  switch (feeType) {
+    case FeeType.Tuition:
+      return 'Tuition';
+    case FeeType.Exam:
+      return 'Exam';
+    case FeeType.Transport:
+      return 'Transport';
+    case FeeType.Library:
+      return 'Library';
+    case FeeType.Misc:
+      return 'Miscellaneous';
+    default:
+      return 'Unknown';
+  }
 };
 
 // Payment Status display utilities
 export const getPaymentStatusDisplay = (paymentStatus: PaymentStatus): string => {
-  return paymentStatus; // Already string values
+  switch (paymentStatus) {
+    case PaymentStatus.Pending:
+      return 'Pending';
+    case PaymentStatus.Partial:
+      return 'Partial';
+    case PaymentStatus.Paid:
+      return 'Paid';
+    case PaymentStatus.Overdue:
+      return 'Overdue';
+    default:
+      return 'Unknown';
+  }
 };
 
 export const getPaymentStatusColor = (paymentStatus: PaymentStatus): 'success' | 'default' | 'error' | 'warning' => {
   switch (paymentStatus) {
-    case PaymentStatus.PAID:
+    case PaymentStatus.Paid:
       return 'success';
-    case PaymentStatus.PENDING:
+    case PaymentStatus.Pending:
       return 'warning';
-    case PaymentStatus.OVERDUE:
+    case PaymentStatus.Overdue:
       return 'error';
-    case PaymentStatus.PARTIAL:
+    case PaymentStatus.Partial:
       return 'warning';
     default:
       return 'default';

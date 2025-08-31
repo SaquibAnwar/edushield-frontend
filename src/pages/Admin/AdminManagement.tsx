@@ -89,6 +89,27 @@ export const AdminManagement: React.FC = () => {
     loadData();
   }, [currentTab]);
 
+  // Load all reference data on component mount for forms
+  useEffect(() => {
+    loadAllReferenceData();
+  }, []);
+
+  const loadAllReferenceData = async () => {
+    try {
+      // Load parents and faculties for form dropdowns
+      const [facultiesResponse, parentsResponse] = await Promise.all([
+        apiService.getFaculties(),
+        apiService.getParents(),
+      ]);
+
+      setFaculties(facultiesResponse);
+      setParents(parentsResponse);
+    } catch (error) {
+      console.error('Error loading reference data:', error);
+      // Don't set error here as it might interfere with main data loading
+    }
+  };
+
   const loadData = async () => {
     try {
       setError(null);
@@ -97,7 +118,7 @@ export const AdminManagement: React.FC = () => {
         case 0: // Students
           setStudentsLoading(true);
           const studentsResponse = await apiService.getStudents();
-          setStudents(studentsResponse); // Direct array response
+          setStudents(studentsResponse.data || []); // Extract data from paginated response
           break;
         case 1: // Faculty
           setFacultiesLoading(true);
@@ -157,21 +178,35 @@ export const AdminManagement: React.FC = () => {
       setFormSubmitting(true);
       setError(null);
 
+      // Clean data for student forms to handle empty parentId and facultyIds
+      let cleanedData = data;
+      if (currentForm === 'student') {
+        cleanedData = {
+          ...data,
+          dateOfBirth: new Date(data.dateOfBirth),
+          enrollmentDate: new Date(data.enrollmentDate),
+          // Convert empty parentId to undefined
+          parentId: data.parentId || undefined,
+          // Convert empty facultyIds to empty array
+          facultyIds: Array.isArray(data.facultyIds) ? data.facultyIds.filter((id: string) => id) : [],
+        };
+      }
+
       let successMsg;
 
       if (editingItem) {
         // Update existing item
         switch (currentForm) {
           case 'student':
-            await apiService.updateStudent(editingItem.id, data);
+            await apiService.updateStudent(editingItem.id, cleanedData);
             successMsg = 'Student updated successfully';
             break;
           case 'faculty':
-            await apiService.updateFaculty(editingItem.id, data);
+            await apiService.updateFaculty(editingItem.id, cleanedData);
             successMsg = 'Faculty updated successfully';
             break;
           case 'parent':
-            await apiService.updateParent(editingItem.id, data);
+            await apiService.updateParent(editingItem.id, cleanedData);
             successMsg = 'Parent updated successfully';
             break;
         }
@@ -179,15 +214,15 @@ export const AdminManagement: React.FC = () => {
         // Create new item
         switch (currentForm) {
           case 'student':
-            await apiService.createStudent(data);
+            await apiService.createStudent(cleanedData);
             successMsg = 'Student created successfully';
             break;
           case 'faculty':
-            await apiService.createFaculty(data);
+            await apiService.createFaculty(cleanedData);
             successMsg = 'Faculty created successfully';
             break;
           case 'parent':
-            await apiService.createParent(data);
+            await apiService.createParent(cleanedData);
             successMsg = 'Parent created successfully';
             break;
         }

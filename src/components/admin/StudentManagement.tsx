@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -143,7 +143,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                 Personal Information
               </Typography>
               <Divider sx={{ mb: 2 }} />
-              
+
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
@@ -153,7 +153,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                     {student.fullName}
                   </Typography>
                 </Box>
-                
+
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     Email
@@ -162,7 +162,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                     {student.email}
                   </Typography>
                 </Box>
-                
+
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     Phone Number
@@ -171,7 +171,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                     {student.phoneNumber}
                   </Typography>
                 </Box>
-                
+
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     Date of Birth
@@ -180,7 +180,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                     {formatDate(student.dateOfBirth)} (Age: {student.age})
                   </Typography>
                 </Box>
-                
+
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     Gender
@@ -189,7 +189,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                     {getGenderDisplay(student.gender)}
                   </Typography>
                 </Box>
-                
+
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     Address
@@ -212,7 +212,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                 Academic Information
               </Typography>
               <Divider sx={{ mb: 2 }} />
-              
+
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
@@ -222,7 +222,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                     {student.rollNumber}
                   </Typography>
                 </Box>
-                
+
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     Grade & Section
@@ -232,7 +232,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                     {student.section && ` - Section ${student.section}`}
                   </Typography>
                 </Box>
-                
+
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     Enrollment Date
@@ -241,7 +241,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                     {formatDate(student.enrollmentDate)}
                   </Typography>
                 </Box>
-                
+
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     Status
@@ -252,7 +252,7 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                     size="small"
                   />
                 </Box>
-                
+
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     Enrollment Status
@@ -278,12 +278,12 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                   Assigned Parent
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
-                
+
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   {(() => {
                     const parent = parents.find((p: any) => p.id === student.parentId);
                     const parentName = parent ? parent.fullName : `Parent ID: ${student.parentId}`;
-                    
+
                     return (
                       <Chip
                         label={parentName}
@@ -309,34 +309,34 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                   Assigned Faculty ({student.assignedFaculties.length})
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
-                
+
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   {student.assignedFaculties?.length > 0 ? (
                     student.assignedFaculties.map((assignment) => {
                       // Try multiple ways to find the faculty
                       let faculty = assignment.faculty;
-                      
+
                       if (!faculty) {
                         // Try exact ID match first
                         faculty = faculties.find((f: any) => f.id === assignment.facultyId);
                       }
-                      
+
                       if (!faculty && assignment.facultyId) {
                         // Try partial ID match (in case of ID format differences)
-                        faculty = faculties.find((f: any) => 
+                        faculty = faculties.find((f: any) =>
                           f.id && assignment.facultyId && (
                             assignment.facultyId.includes(f.id) || f.id.includes(assignment.facultyId)
                           )
                         );
                       }
-                      
+
                       let facultyName;
-                      
+
                       // Check if assignment has embedded faculty data
-                      if (assignment.firstName && assignment.lastName) {
+                      if (assignment.faculty?.firstName && assignment.faculty?.lastName) {
                         // Faculty data is embedded directly in the assignment
-                        const name = `${assignment.firstName} ${assignment.lastName}`;
-                        const subject = assignment.subject || '';
+                        const name = `${assignment.faculty.firstName} ${assignment.faculty.lastName}`;
+                        const subject = assignment.faculty.subject || '';
                         facultyName = subject ? `${name} - ${subject}` : name;
                       } else if (faculty) {
                         // Found faculty in the faculties list
@@ -345,16 +345,16 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
                         facultyName = subject ? `${name} - ${subject}` : name;
                       } else if (assignment.faculty) {
                         // Use nested faculty object
-                        const name = assignment.faculty.fullName || 
-                                   `${assignment.faculty.firstName || ''} ${assignment.faculty.lastName || ''}`.trim() || 
-                                   'Unknown Faculty';
+                        const name = assignment.faculty.fullName ||
+                          `${assignment.faculty.firstName || ''} ${assignment.faculty.lastName || ''}`.trim() ||
+                          'Unknown Faculty';
                         const subject = assignment.faculty.subject || '';
                         facultyName = subject ? `${name} - ${subject}` : name;
                       } else {
                         // Fallback
                         facultyName = 'Faculty (ID not found)';
                       }
-                      
+
                       return (
                         <Chip
                           key={assignment.id}
@@ -413,73 +413,89 @@ export const StudentManagement: React.FC = () => {
   const [filters, setFilters] = useState<StudentFilters>({});
   const [showFilters, setShowFilters] = useState(false);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+
   // Error state
   const [error, setError] = useState<string | null>(null);
 
+  // Memoize the search filters to prevent unnecessary re-renders
+  const searchFilters = useMemo(() => {
+    return {
+      ...filters,
+      search: searchTerm || undefined,
+      page: currentPage,
+      limit: pageSize,
+    };
+  }, [filters, searchTerm, currentPage, pageSize]);
+
   // Load data
-  const loadStudents = useCallback(async () => {
+  const loadStudents = useCallback(async (abortSignal?: AbortSignal) => {
+
     try {
       setLoading(true);
       setError(null);
+
+      // Check if request was aborted
+      if (abortSignal?.aborted) {
+        return;
+      }
 
       // Check authentication status
       if (!isAuthenticated) {
         setError('Authentication required. Please log in again.');
         return;
       }
-
-      const searchFilters: StudentFilters = {
-        ...filters,
-        search: searchTerm || undefined,
-      };
-
-      console.log('Loading students with filters:', searchFilters);
       const response = await apiService.getStudents(searchFilters);
-      
-      // The backend returns students directly as an array, not wrapped in a paginated response
-      if (!Array.isArray(response)) {
-        console.error('Expected array but got:', typeof response, response);
+
+      // The backend now returns a paginated response
+      if (!response || !response.data) {
         setStudents([]);
         setTotalStudents(0);
+        setTotalCount(0);
         return;
       }
-      
+
       // Filter out any null/undefined students and ensure they have required properties
-      const validStudents = response.filter(student => {
+      const validStudents = response.data.filter(student => {
         return student && typeof student === 'object' && student.id;
       });
-      
-      console.log('✅ Loaded students:', validStudents.length, 'students');
-      
-      setStudents(validStudents);
+
+      // Check if request was aborted before updating state
+      if (abortSignal?.aborted) {
+        return;
+      }
+
+      // Update state with paginated data
+      setStudents([...validStudents]);
       setTotalStudents(validStudents.length);
-      
+      setTotalCount(response.totalCount);
+
     } catch (err) {
-      console.error('Error loading students:', err);
       setError(err instanceof Error ? err.message : 'Failed to load students');
       // Ensure we set empty arrays on error
       setStudents([]);
       setTotalStudents(0);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, filters]);
+  }, [searchFilters, isAuthenticated]);
 
   const loadParentsAndFaculties = useCallback(async () => {
     try {
-      console.log('Loading parents and faculties...');
       const [parentsResponse, facultiesResponse] = await Promise.all([
         apiService.getParents(),
         apiService.getFaculties(),
       ]);
-      console.log('Parents response:', parentsResponse);
-      console.log('Faculties response:', facultiesResponse);
-      
+
+
       // Backend returns direct arrays, not paginated responses
       setParents(Array.isArray(parentsResponse) ? parentsResponse : []);
       setFaculties(Array.isArray(facultiesResponse) ? facultiesResponse : []);
     } catch (err) {
-      console.error('Error loading parents and faculties:', err);
       // Set empty arrays on error
       setParents([]);
       setFaculties([]);
@@ -488,18 +504,21 @@ export const StudentManagement: React.FC = () => {
 
   // Effects
   useEffect(() => {
-    console.log('useEffect: Loading students...');
-    loadStudents();
+    const abortController = new AbortController();
+    loadStudents(abortController.signal);
+
+    return () => {
+      abortController.abort();
+    };
   }, [loadStudents]);
 
   useEffect(() => {
-    console.log('useEffect: Loading parents and faculties...');
     loadParentsAndFaculties();
   }, [loadParentsAndFaculties]);
 
   // Monitor students state changes
   useEffect(() => {
-    console.log('Students state changed:', students.length, 'students');
+    // Students state monitoring removed
   }, [students]);
 
   // Handlers
@@ -509,21 +528,30 @@ export const StudentManagement: React.FC = () => {
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
+    // Reset to first page when search changes
+    setCurrentPage(1);
   };
 
   const handleFilterChange = (key: keyof StudentFilters, value: any) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value || undefined,
-    }));
+    setFilters(prev => {
+      const newFilters = {
+        ...prev,
+        [key]: value === '' ? undefined : value,
+      };
+      return newFilters;
+    });
+    // Reset to first page when filters change
+    setCurrentPage(1);
   };
 
   const clearFilters = () => {
     setSearchTerm('');
     setFilters({});
+    setCurrentPage(1);
   };
 
   const handleRefresh = () => {
+    setCurrentPage(1);
     loadStudents();
   };
 
@@ -582,6 +610,18 @@ export const StudentManagement: React.FC = () => {
     }
   };
 
+  // Pagination handlers
+  const handlePageChange = (page: number, newPageSize: number) => {
+    if (newPageSize !== pageSize) {
+      // Page size changed
+      setPageSize(newPageSize);
+      setCurrentPage(1); // Reset to first page when page size changes
+    } else {
+      // Just page changed
+      setCurrentPage(page);
+    }
+  };
+
   const handleFormSubmit = async (data: StudentFormData) => {
     try {
       setFormSubmitting(true);
@@ -591,8 +631,8 @@ export const StudentManagement: React.FC = () => {
         ...data,
         dateOfBirth: new Date(data.dateOfBirth),
         enrollmentDate: new Date(data.enrollmentDate),
-        // Convert empty parentId to null
-        parentId: data.parentId || null,
+        // Convert empty parentId to undefined
+        parentId: data.parentId || undefined,
         // Convert empty facultyIds to empty array
         facultyIds: Array.isArray(data.facultyIds) ? data.facultyIds.filter(id => id) : [],
       };
@@ -635,9 +675,9 @@ export const StudentManagement: React.FC = () => {
     { key: 'email', title: 'Email', sortable: true },
     { key: 'grade', title: 'Grade', sortable: true },
     { key: 'section', title: 'Section', sortable: true },
-    { 
-      key: 'status', 
-      title: 'Status', 
+    {
+      key: 'status',
+      title: 'Status',
       sortable: true,
       render: (_, record) => (
         <Chip
@@ -695,294 +735,325 @@ export const StudentManagement: React.FC = () => {
   return (
     <Layout>
       <Box sx={{ p: 4 }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <SchoolIcon color="primary" />
-        <Typography variant="h4" component="h1">
-          Student Management
-        </Typography>
-      </Box>
-
-
-
-      {/* Error Display */}
-      {error && (
-        <Box sx={{ mb: 3 }}>
-          <ErrorMessage
-            error={error}
-            showRetry
-            onRetry={() => {
-              setError(null);
-              loadStudents();
-            }}
-          />
-        </Box>
-      )}
-
-      {/* Main Content */}
-      <Paper sx={{ width: '100%' }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={currentTab} onChange={handleTabChange}>
-            <Tab
-              icon={<PersonIcon />}
-              label={`All Students (${totalStudents})`}
-              iconPosition="start"
-            />
-            <Tab
-              icon={<SearchIcon />}
-              label="Search & Filter"
-              iconPosition="start"
-            />
-          </Tabs>
+        {/* Header */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+          <SchoolIcon color="primary" />
+          <Typography variant="h4" component="h1">
+            Student Management
+          </Typography>
         </Box>
 
-        <TabPanel value={currentTab} index={0}>
-          <Box sx={{ p: 3 }}>
-            {/* Action Bar */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <TextField
-                  size="small"
-                  placeholder="Search students..."
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                    endAdornment: searchTerm && (
-                      <InputAdornment position="end">
-                        <IconButton size="small" onClick={() => setSearchTerm('')}>
-                          <ClearIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{ minWidth: 300 }}
-                />
-                <Button
-                  variant="outlined"
-                  startIcon={<FilterIcon />}
-                  onClick={() => setShowFilters(!showFilters)}
-                >
-                  Filters
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<RefreshIcon />}
-                  onClick={handleRefresh}
-                  disabled={loading}
-                >
-                  Refresh
-                </Button>
-              </Box>
 
-              {canManageUsers && (
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={handleCreateStudent}
-                >
-                  Add Student
-                </Button>
-              )}
-            </Box>
 
-            {/* Filters */}
-            {showFilters && (
-              <Card sx={{ mb: 3 }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Filters
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel>Status</InputLabel>
-                        <Select
-                          value={filters.status || ''}
-                          label="Status"
-                          onChange={(e) => handleFilterChange('status', e.target.value)}
-                        >
-                          <MenuItem value="">All</MenuItem>
-                          <MenuItem value={StudentStatus.ACTIVE}>Active</MenuItem>
-                          <MenuItem value={StudentStatus.INACTIVE}>Inactive</MenuItem>
-                          <MenuItem value={StudentStatus.SUSPENDED}>Suspended</MenuItem>
-                          <MenuItem value={StudentStatus.GRADUATED}>Graduated</MenuItem>
-                          <MenuItem value={StudentStatus.TRANSFERRED}>Transferred</MenuItem>
-                          <MenuItem value={StudentStatus.WITHDRAWN}>Withdrawn</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel>Gender</InputLabel>
-                        <Select
-                          value={filters.gender || ''}
-                          label="Gender"
-                          onChange={(e) => handleFilterChange('gender', e.target.value)}
-                        >
-                          <MenuItem value="">All</MenuItem>
-                          <MenuItem value={Gender.MALE}>Male</MenuItem>
-                          <MenuItem value={Gender.FEMALE}>Female</MenuItem>
-                          <MenuItem value={Gender.OTHER}>Other</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <TextField
-                        fullWidth
-                        size="small"
-                        label="Grade"
-                        value={filters.grade || ''}
-                        onChange={(e) => handleFilterChange('grade', e.target.value)}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <TextField
-                        fullWidth
-                        size="small"
-                        label="Section"
-                        value={filters.section || ''}
-                        onChange={(e) => handleFilterChange('section', e.target.value)}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-                    <Button
-                      variant="outlined"
-                      onClick={clearFilters}
-                      startIcon={<ClearIcon />}
-                    >
-                      Clear Filters
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            )}
 
-            {/* Students Table */}
-            <DataTable
-              data={students || []}
-              columns={studentColumns}
-              loading={loading}
-              onRowClick={handleViewStudent}
-              pagination={{
-                current: 1,
-                pageSize: 10,
-                total: totalStudents,
-                showSizeChanger: true,
-                showQuickJumper: true,
-                onChange: (page: number, pageSize: number) => {
-                  // Handle pagination change
-                  console.log('Pagination changed:', page, pageSize);
-                },
+
+        {/* Error Display */}
+        {error && (
+          <Box sx={{ mb: 3 }}>
+            <ErrorMessage
+              error={error}
+              showRetry
+              onRetry={() => {
+                setError(null);
+                loadStudents();
               }}
             />
           </Box>
-        </TabPanel>
+        )}
 
-        <TabPanel value={currentTab} index={1}>
-          <Box sx={{ p: 3 }}>
-            <Alert severity="info" sx={{ mb: 3 }}>
-              <Typography variant="body2">
-                Use the search and filter options in the "All Students" tab to find specific students.
-                You can search by name, email, roll number, or use filters for status, gender, grade, and section.
-              </Typography>
-            </Alert>
+        {/* Main Content */}
+        <Paper sx={{ width: '100%' }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={currentTab} onChange={handleTabChange}>
+              <Tab
+                icon={<PersonIcon />}
+                label={`All Students (${totalStudents})`}
+                iconPosition="start"
+              />
+              <Tab
+                icon={<SearchIcon />}
+                label="Search & Filter"
+                iconPosition="start"
+              />
+            </Tabs>
           </Box>
-        </TabPanel>
-      </Paper>
 
-      {/* Create Student Modal */}
-      <Modal
-        open={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        title="Create New Student"
-        width="lg"
-        loading={formSubmitting}
-      >
-        <StudentForm
-          onSubmit={handleFormSubmit}
-          onCancel={() => setCreateModalOpen(false)}
+          <TabPanel value={currentTab} index={0}>
+            <Box sx={{ p: 3 }}>
+              {/* Action Bar */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <TextField
+                    size="small"
+                    placeholder="Search students..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                      endAdornment: searchTerm && (
+                        <InputAdornment position="end">
+                          <IconButton size="small" onClick={() => setSearchTerm('')}>
+                            <ClearIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{ minWidth: 300 }}
+                  />
+                  <Button
+                    variant="outlined"
+                    startIcon={<FilterIcon />}
+                    onClick={() => setShowFilters(!showFilters)}
+                  >
+                    Filters
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<RefreshIcon />}
+                    onClick={handleRefresh}
+                    disabled={loading}
+                  >
+                    Refresh
+                  </Button>
+                </Box>
+
+                {canManageUsers && (
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={handleCreateStudent}
+                  >
+                    Add Student
+                  </Button>
+                )}
+              </Box>
+
+              {/* Filters */}
+              {showFilters && (
+                <Card sx={{ mb: 3 }}>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Filters
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>Status</InputLabel>
+                          <Select
+                            value={filters.status !== undefined ? String(filters.status) : ''}
+                            label="Status"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              handleFilterChange('status', value === '' ? undefined : Number(value));
+                            }}
+                          >
+                            <MenuItem value="">All</MenuItem>
+                            <MenuItem value={String(StudentStatus.ACTIVE)}>Active</MenuItem>
+                            <MenuItem value={String(StudentStatus.INACTIVE)}>Inactive</MenuItem>
+                            <MenuItem value={String(StudentStatus.SUSPENDED)}>Suspended</MenuItem>
+                            <MenuItem value={String(StudentStatus.GRADUATED)}>Graduated</MenuItem>
+                            <MenuItem value={String(StudentStatus.TRANSFERRED)}>Transferred</MenuItem>
+                            <MenuItem value={String(StudentStatus.WITHDRAWN)}>Withdrawn</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>Gender</InputLabel>
+                          <Select
+                            value={filters.gender !== undefined ? String(filters.gender) : ''}
+                            label="Gender"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              handleFilterChange('gender', value === '' ? undefined : Number(value));
+                            }}
+                          >
+                            <MenuItem value="">All</MenuItem>
+                            <MenuItem value={String(Gender.MALE)}>Male</MenuItem>
+                            <MenuItem value={String(Gender.FEMALE)}>Female</MenuItem>
+                            <MenuItem value={String(Gender.OTHER)}>Other</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Grade"
+                          value={filters.grade || ''}
+                          onChange={(e) => handleFilterChange('grade', e.target.value)}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Section"
+                          value={filters.section || ''}
+                          onChange={(e) => handleFilterChange('section', e.target.value)}
+                        />
+                      </Grid>
+                    </Grid>
+                    <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                      <Button
+                        variant="outlined"
+                        onClick={clearFilters}
+                        startIcon={<ClearIcon />}
+                      >
+                        Clear Filters
+                      </Button>
+                    </Box>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Students Table */}
+              <DataTable
+                data={students || []}
+                columns={studentColumns}
+                loading={loading}
+                onRowClick={handleViewStudent}
+                pagination={{
+                  current: currentPage,
+                  pageSize: pageSize,
+                  total: totalCount,
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  onChange: handlePageChange,
+                }}
+              />
+            </Box>
+          </TabPanel>
+
+          <TabPanel value={currentTab} index={1}>
+            <Box sx={{ p: 3 }}>
+              <Alert severity="info" sx={{ mb: 3 }}>
+                <Typography variant="body2">
+                  Use the search and filter options in the "All Students" tab to find specific students.
+                  You can search by name, email, roll number, or use filters for status, gender, grade, and section.
+                </Typography>
+              </Alert>
+            </Box>
+          </TabPanel>
+        </Paper >
+
+        {/* Create Student Modal */}
+        < Modal
+          open={createModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+          title="Create New Student"
+          width="lg"
           loading={formSubmitting}
-          mode="create"
-          parents={Array.isArray(parents) ? parents.map(p => ({ id: p.id, fullName: p.fullName })) : []}
-          faculties={Array.isArray(faculties) ? faculties.map(f => ({ id: f.id, fullName: f.fullName })) : []}
-        />
-      </Modal>
-
-      {/* Edit Student Modal */}
-      <Modal
-        open={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        title="Edit Student"
-        width="lg"
-        loading={formSubmitting}
-      >
-        {selectedStudent && (
+        >
           <StudentForm
-            initialData={selectedStudent}
             onSubmit={handleFormSubmit}
-            onCancel={() => setEditModalOpen(false)}
+            onCancel={() => setCreateModalOpen(false)}
             loading={formSubmitting}
-            mode="edit"
+            mode="create"
             parents={Array.isArray(parents) ? parents.map(p => ({ id: p.id, fullName: p.fullName })) : []}
             faculties={Array.isArray(faculties) ? faculties.map(f => ({ id: f.id, fullName: f.fullName })) : []}
           />
-        )}
-      </Modal>
+        </Modal >
 
-      {/* Student Detail Modal */}
-      <Modal
-        open={detailModalOpen}
-        onClose={() => setDetailModalOpen(false)}
-        title=""
-        width="lg"
-      >
-        {selectedStudent && (
-          <StudentDetailView
-            student={selectedStudent}
-            onClose={() => setDetailModalOpen(false)}
-            onEdit={handleEditStudent}
-            onDelete={handleDeleteStudent}
-            faculties={faculties}
-            parents={parents}
-          />
-        )}
-      </Modal>
+        {/* Edit Student Modal */}
+        < Modal
+          open={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          title="Edit Student"
+          width="lg"
+          loading={formSubmitting}
+        >
+          {selectedStudent && (
+            <StudentForm
+              initialData={{
+                ...selectedStudent,
+                // Since faculty IDs don't match between assignments and available faculties,
+                // we need to find matching faculties by name or other criteria
+                facultyIds: (() => {
+                  if (!selectedStudent.assignedFaculties || !Array.isArray(faculties)) {
+                    return [];
+                  }
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete student "{studentToDelete?.fullName}"?
-            This action cannot be undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
-            Cancel
-          </Button>
-          <Button
-            onClick={confirmDelete}
-            color="error"
-            variant="contained"
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-      </Box>
-    </Layout>
+                  const matchedIds: string[] = [];
+                  selectedStudent.assignedFaculties.forEach(assignment => {
+                    // Try to find matching faculty by name
+                    const assignmentName = assignment.faculty ? `${assignment.faculty.firstName} ${assignment.faculty.lastName}` : '';
+                    const matchingFaculty = faculties.find((f: any) =>
+                      f.fullName === assignmentName ||
+                      `${f.firstName} ${f.lastName}` === assignmentName
+                    );
+
+                    if (matchingFaculty) {
+                      matchedIds.push(matchingFaculty.id);
+                    }
+                  });
+
+
+                  return matchedIds;
+                })()
+              }}
+              onSubmit={handleFormSubmit}
+              onCancel={() => setEditModalOpen(false)}
+              loading={formSubmitting}
+              mode="edit"
+              parents={Array.isArray(parents) ? parents.map(p => ({ id: p.id, fullName: p.fullName })) : []}
+              faculties={Array.isArray(faculties) ? faculties.map(f => ({ id: f.id, fullName: f.fullName })) : []}
+            />
+          )}
+        </Modal >
+
+        {/* Student Detail Modal */}
+        < Modal
+          open={detailModalOpen}
+          onClose={() => setDetailModalOpen(false)}
+          title=""
+          width="lg"
+        >
+          {selectedStudent && (
+            <StudentDetailView
+              student={selectedStudent}
+              onClose={() => setDetailModalOpen(false)}
+              onEdit={handleEditStudent}
+              onDelete={handleDeleteStudent}
+              faculties={faculties}
+              parents={parents}
+            />
+          )}
+        </Modal >
+
+        {/* Delete Confirmation Dialog */}
+        < Dialog
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to delete student "{studentToDelete?.fullName}"?
+              This action cannot be undone.
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmDelete}
+              color="error"
+              variant="contained"
+            >
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog >
+      </Box >
+    </Layout >
   );
 };
 

@@ -14,12 +14,15 @@ export interface ApiError {
   code?: string;
 }
 
+// Paginated response interface
 export interface PaginatedResponse<T> {
   data: T[];
-  total: number;
+  totalCount: number;
   page: number;
-  limit: number;
+  pageSize: number;
   totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
 // Filter interfaces
@@ -152,11 +155,7 @@ export interface CreateFeeRequest {
   feeType: FeeType;
   term: string;
   totalAmount: number;
-  amountPaid: number;
-  paymentStatus: PaymentStatus;
   dueDate: string;
-  lastPaymentDate?: string;
-  fineAmount: number;
   notes?: string;
 }
 
@@ -181,7 +180,9 @@ export interface BulkUpdateRequest<T> {
 export interface AssignFacultyToStudentRequest {
   studentId: string;
   facultyId: string;
+  subject?: string;
   notes?: string;
+  isActive: boolean;
 }
 
 export interface AssignParentToStudentRequest {
@@ -191,6 +192,7 @@ export interface AssignParentToStudentRequest {
   isPrimaryContact: boolean;
   isAuthorizedToPickup: boolean;
   isEmergencyContact: boolean;
+  isActive: boolean;
   notes?: string;
 }
 

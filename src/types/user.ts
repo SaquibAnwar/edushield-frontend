@@ -15,25 +15,29 @@ export enum StudentStatus {
 }
 
 export enum ExamType {
-  MIDTERM = 'Midterm',
-  FINAL = 'Final',
-  QUIZ = 'Quiz',
-  ASSIGNMENT = 'Assignment',
+  UnitTest = 0,
+  MidTerm = 1,
+  Final = 2,
+  Assignment = 3,
+  Laboratory = 4,
+  Presentation = 5,
+  ContinuousAssessment = 6,
+  Other = 7,
 }
 
 export enum FeeType {
-  TUITION = 'Tuition',
-  EXAM = 'Exam',
-  TRANSPORT = 'Transport',
-  LIBRARY = 'Library',
-  MISC = 'Misc',
+  Tuition = 0,
+  Exam = 1,
+  Transport = 2,
+  Library = 3,
+  Misc = 4,
 }
 
 export enum PaymentStatus {
-  PAID = 'Paid',
-  PENDING = 'Pending',
-  OVERDUE = 'Overdue',
-  PARTIAL = 'Partial',
+  Pending = 0,
+  Partial = 1,
+  Paid = 2,
+  Overdue = 3,
 }
 
 export enum ParentType {
