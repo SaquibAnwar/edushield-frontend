@@ -114,6 +114,7 @@ const ParentFormTest: React.FC = () => {
     parentType: ParentType.PRIMARY, // Now uses numeric value (0)
     isEmergencyContact: false,
     isAuthorizedToPickup: true,
+    isActive: true,
   };
 
   return (

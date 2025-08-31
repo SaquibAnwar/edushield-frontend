@@ -135,6 +135,16 @@ export interface DateConverter {
   dateTimeToFormDate(date: Date): string;
   backendDateTimeToDate(backendDateTime: string): Date;
   dateToBackendDateTime(date: Date): string;
+  formatForDisplay(date: Date | string): string;
+}
+
+/**
+ * Formats a date for display purposes (alias for formatDate)
+ * @param date - Date object or date string to format
+ * @returns Formatted date string
+ */
+export function formatForDisplay(date: Date | string): string {
+  return formatDate(date);
 }
 
 /**
@@ -148,6 +158,7 @@ export const dateConverter: DateConverter = {
   dateTimeToFormDate,
   backendDateTimeToDate,
   dateToBackendDateTime,
+  formatForDisplay,
 };
 
 /**

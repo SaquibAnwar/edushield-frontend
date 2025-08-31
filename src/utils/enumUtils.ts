@@ -259,6 +259,28 @@ export const getPaymentStatusLabel = getPaymentStatusDisplay;
 export const getParentTypeLabel = getParentTypeDisplay;
 export const getParentStatusLabel = getParentStatusDisplay;
 
+// Generic function to get enum display name
+export const getEnumDisplayName = (enumType: string, value: any): string => {
+  switch (enumType) {
+    case 'Gender':
+      return getGenderDisplay(value);
+    case 'StudentStatus':
+      return getStudentStatusDisplay(value);
+    case 'ParentType':
+      return getParentTypeDisplay(value);
+    case 'ParentStatus':
+      return getParentStatusDisplay(value);
+    case 'ExamType':
+      return getExamTypeDisplay(value);
+    case 'FeeType':
+      return getFeeTypeDisplay(value);
+    case 'PaymentStatus':
+      return getPaymentStatusDisplay(value);
+    default:
+      return 'Unknown';
+  }
+};
+
 // Export all functions as a single object for easier importing
 export const enumUtils = {
   getGenderDisplay,
@@ -283,4 +305,5 @@ export const enumUtils = {
   getGenderOptions,
   getParentTypeOptions,
   getParentStatusOptions,
+  getEnumDisplayName,
 };
