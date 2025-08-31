@@ -140,6 +140,46 @@ export const getPaymentStatusColor = (paymentStatus: PaymentStatus): 'success' |
   }
 };
 
+export const getExamTypeColor = (examType: ExamType): string => {
+  switch (examType) {
+    case ExamType.UnitTest:
+      return '#2196f3'; // Blue
+    case ExamType.MidTerm:
+      return '#ff9800'; // Orange
+    case ExamType.Final:
+      return '#f44336'; // Red
+    case ExamType.Assignment:
+      return '#4caf50'; // Green
+    case ExamType.Laboratory:
+      return '#9c27b0'; // Purple
+    case ExamType.Presentation:
+      return '#00bcd4'; // Cyan
+    case ExamType.ContinuousAssessment:
+      return '#795548'; // Brown
+    case ExamType.Other:
+      return '#607d8b'; // Blue Grey
+    default:
+      return '#424242'; // Dark Grey
+  }
+};
+
+export const getFeeTypeColor = (feeType: FeeType): string => {
+  switch (feeType) {
+    case FeeType.Tuition:
+      return '#1976d2'; // Blue
+    case FeeType.Exam:
+      return '#388e3c'; // Green
+    case FeeType.Transport:
+      return '#f57c00'; // Orange
+    case FeeType.Library:
+      return '#7b1fa2'; // Purple
+    case FeeType.Misc:
+      return '#616161'; // Grey
+    default:
+      return '#424242'; // Dark Grey
+  }
+};
+
 // Get all enum options for dropdowns
 export const getStudentStatusOptions = () => [
   { value: StudentStatus.ACTIVE, label: getStudentStatusDisplay(StudentStatus.ACTIVE) },
@@ -161,3 +201,33 @@ export const getParentTypeOptions = () => [
   { value: ParentType.SECONDARY, label: getParentTypeDisplay(ParentType.SECONDARY) },
   { value: ParentType.GUARDIAN, label: getParentTypeDisplay(ParentType.GUARDIAN) },
 ];
+
+// Alias functions for consistency with component usage
+export const getGenderLabel = getGenderDisplay;
+export const getStudentStatusLabel = getStudentStatusDisplay;
+export const getExamTypeLabel = getExamTypeDisplay;
+export const getFeeTypeLabel = getFeeTypeDisplay;
+export const getPaymentStatusLabel = getPaymentStatusDisplay;
+export const getParentTypeLabel = getParentTypeDisplay;
+
+// Export all functions as a single object for easier importing
+export const enumUtils = {
+  getGenderDisplay,
+  getGenderLabel,
+  getStudentStatusDisplay,
+  getStudentStatusLabel,
+  getStudentStatusColor,
+  getParentTypeDisplay,
+  getParentTypeLabel,
+  getExamTypeDisplay,
+  getExamTypeLabel,
+  getFeeTypeDisplay,
+  getFeeTypeLabel,
+  getFeeTypeColor,
+  getPaymentStatusDisplay,
+  getPaymentStatusLabel,
+  getPaymentStatusColor,
+  getStudentStatusOptions,
+  getGenderOptions,
+  getParentTypeOptions,
+};

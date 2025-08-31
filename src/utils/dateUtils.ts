@@ -177,6 +177,33 @@ export function convertFormDatesToDateTime<T extends Record<string, any>>(
 }
 
 /**
+ * Formats a date for display purposes
+ * @param date - Date object or date string to format
+ * @param options - Intl.DateTimeFormatOptions for formatting
+ * @returns Formatted date string
+ */
+export function formatDate(date: Date | string, options?: Intl.DateTimeFormatOptions): string {
+  if (!date) {
+    return '';
+  }
+  
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  if (isNaN(dateObj.getTime())) {
+    return 'Invalid Date';
+  }
+  
+  const defaultOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    ...options
+  };
+  
+  return dateObj.toLocaleDateString('en-US', defaultOptions);
+}
+
+/**
  * Utility function to safely convert Date objects to form date strings
  * @param data - Data object with Date objects
  * @param dateFields - Array of field names that contain Date objects
