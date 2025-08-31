@@ -78,7 +78,7 @@ export const getAccessibleRoutes = (userRole: UserRole): string[] => {
       break;
       
     case UserRole.Student:
-      routes.push('/student', '/student/dashboard');
+      routes.push('/student', '/student/dashboard', '/student/performance');
       // Add more student routes as they're implemented
       break;
       

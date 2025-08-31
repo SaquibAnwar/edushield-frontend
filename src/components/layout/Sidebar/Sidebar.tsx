@@ -145,6 +145,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick: () => handleNavigation('/admin/faculty')
           },
           {
+            label: 'Parent Management',
+            icon: <FamilyIcon />,
+            path: '/admin/parents',
+            onClick: () => handleNavigation('/admin/parents')
+          },
+          {
             label: 'Academic Management',
             icon: <SchoolIcon />,
             path: '/admin/academic',
@@ -260,8 +266,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             label: 'My Performance',
             icon: <GradeIcon />,
             path: '/student/performance',
-            onClick: () => handleNavigation('/student/performance'),
-            disabled: true // Will be enabled in future tasks
+            onClick: () => handleNavigation('/student/performance')
           },
           {
             label: 'Assignments',

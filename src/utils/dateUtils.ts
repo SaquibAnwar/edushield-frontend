@@ -138,6 +138,58 @@ export interface DateConverter {
 }
 
 /**
+ * Formats a date for display in the UI
+ * @param date - Date string or Date object to format
+ * @returns Formatted date string for display
+ */
+export function formatDisplayDate(date: string | Date): string {
+  if (!date) {
+    return 'N/A';
+  }
+  
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    
+    if (isNaN(dateObj.getTime())) {
+      return 'Invalid Date';
+    }
+    
+    return dateObj.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  } catch (error) {
+    console.error('Error formatting display date:', error);
+    return 'Invalid Date';
+  }
+}
+
+/**
+ * Formats a date for display (alias for formatDisplayDate)
+ * @param date - Date string or Date object to format
+ * @returns Formatted date string for display
+ */
+export function formatDate(date: string | Date): string {
+  return formatDisplayDate(date);
+}
+
+/**
+ * Date conversion utilities interface for type safety
+ */
+export interface DateConverter {
+  stringToDateTime(dateString: string): Date;
+  formatForBackend(date: Date): string;
+  validateDateFormat(dateString: string): boolean;
+  formDateToDateTime(dateInput: string): Date;
+  dateTimeToFormDate(date: Date): string;
+  backendDateTimeToDate(backendDateTime: string): Date;
+  dateToBackendDateTime(date: Date): string;
+  formatDisplayDate(date: string | Date): string;
+  formatDate(date: string | Date): string;
+}
+
+/**
  * Default date converter implementation
  */
 export const dateConverter: DateConverter = {
@@ -148,6 +200,8 @@ export const dateConverter: DateConverter = {
   dateTimeToFormDate,
   backendDateTimeToDate,
   dateToBackendDateTime,
+  formatDisplayDate,
+  formatDate,
 };
 
 /**

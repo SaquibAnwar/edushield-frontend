@@ -1,4 +1,5 @@
 import StudentDashboard from './StudentDashboard';
+import StudentPerformance from './StudentPerformance';
 
-export { StudentDashboard };
+export { StudentDashboard, StudentPerformance };
 export default StudentDashboard;

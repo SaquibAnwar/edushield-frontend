@@ -11,8 +11,8 @@ import { Home } from '../pages/Home';
 import { AdminDashboard } from '../pages/Admin';
 import { AdminManagement } from '../pages/Admin/AdminManagement';
 import { AdminSettings } from '../pages/Admin/AdminSettings';
-import { StudentManagement, StudentDataManagement, FacultyManagement } from '../components/admin';
-import { StudentDashboard } from '../pages/Student';
+import { StudentManagement, StudentDataManagement, FacultyManagement, ParentManagement } from '../components/admin';
+import { StudentDashboard, StudentPerformance } from '../pages/Student';
 import { ParentDashboard } from '../pages/Parent';
 import { FacultyDashboard } from '../pages/Faculty';
 import { TestComponentsGuard } from '../components/ui/TestComponents/TestComponentsGuard';
@@ -137,6 +137,17 @@ export const routeConfigs: RouteConfig[] = [
     exact: true,
     description: 'Admin faculty management with comprehensive CRUD operations'
   },
+  {
+    path: '/admin/parents',
+    element: (
+      <AdminRouteGuard>
+        <ParentManagement />
+      </AdminRouteGuard>
+    ),
+    requiredRoles: ROUTE_PERMISSIONS.ADMIN_ONLY,
+    exact: true,
+    description: 'Admin parent management with comprehensive CRUD operations'
+  },
 
   // Student routes
   {
@@ -152,6 +163,13 @@ export const routeConfigs: RouteConfig[] = [
     requiredRoles: ROUTE_PERMISSIONS.STUDENT_ONLY,
     exact: true,
     description: 'Redirect to student dashboard'
+  },
+  {
+    path: '/student/performance',
+    element: <StudentPerformance />,
+    requiredRoles: ROUTE_PERMISSIONS.STUDENT_ONLY,
+    exact: true,
+    description: 'Student academic performance view with subject-wise breakdown'
   },
 
   // Parent routes

@@ -2,118 +2,212 @@ import React from 'react';
 import {
   Box,
   Typography,
+  Button,
+  Alert,
+  Skeleton,
   Paper,
-  Button
+  Breadcrumbs,
+  Link
 } from '@mui/material';
 import {
-  Book as BookIcon,
-  Assignment as AssignmentIcon,
+  Refresh as RefreshIcon,
+  Home as HomeIcon,
+  Person as PersonIcon,
   Grade as GradeIcon,
   Payment as PaymentIcon
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useStudentData } from '../../hooks/useStudentData';
 import { Layout } from '../../components/layout';
+import { 
+  StudentProfile, 
+  StudentMetricsComponent, 
+  RecentActivity 
+} from '../../components/student';
 
 export const StudentDashboard: React.FC = () => {
-  const { user, getDisplayName, getEmail } = useAuth();
+  const { getDisplayName } = useAuth();
+  const navigate = useNavigate();
+  const {
+    student,
+    metrics,
+    recentPerformances,
+    recentFees,
+    isLoading,
+    error,
+    refetch
+  } = useStudentData();
+
+  const handleRefresh = async () => {
+    await refetch();
+  };
+
+  const handleNavigateToPerformance = () => {
+    navigate('/student/performance');
+  };
+
+  const handleNavigateToFees = () => {
+    navigate('/student/fees');
+  };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <Box sx={{ p: 4 }}>
+          <Skeleton variant="text" width="60%" height={60} />
+          <Skeleton variant="text" width="40%" height={30} sx={{ mb: 4 }} />
+          
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Skeleton variant="rectangular" height={200} />
+            <Skeleton variant="rectangular" height={150} />
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+              <Box sx={{ flex: '1 1 400px', minWidth: '300px' }}>
+                <Skeleton variant="rectangular" height={300} />
+              </Box>
+              <Box sx={{ flex: '1 1 400px', minWidth: '300px' }}>
+                <Skeleton variant="rectangular" height={300} />
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <Box sx={{ p: 4 }}>
+          <Alert 
+            severity="error" 
+            action={
+              <Button 
+                color="inherit" 
+                size="small" 
+                onClick={handleRefresh}
+                startIcon={<RefreshIcon />}
+              >
+                Retry
+              </Button>
+            }
+          >
+            {error}
+          </Alert>
+        </Box>
+      </Layout>
+    );
+  }
+
+  if (!student) {
+    return (
+      <Layout>
+        <Box sx={{ p: 4 }}>
+          <Alert severity="warning">
+            Student profile not found. Please contact your administrator.
+          </Alert>
+        </Box>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
+      {/* Breadcrumbs */}
+      <Box sx={{ p: 4, pb: 2 }}>
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link
+            underline="hover"
+            sx={{ display: 'flex', alignItems: 'center' }}
+            color="inherit"
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/student');
+            }}
+          >
+            <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+            Dashboard
+          </Link>
+          <Typography
+            sx={{ display: 'flex', alignItems: 'center' }}
+            color="text.primary"
+          >
+            <PersonIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+            Profile
+          </Typography>
+        </Breadcrumbs>
+      </Box>
+
       {/* Header */}
-      <Box sx={{ p: 4, borderBottom: 1, borderColor: 'divider' }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Welcome back, {getDisplayName()}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          {getEmail()} • Role: {user?.role}
-        </Typography>
+      <Box sx={{ px: 4, pb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <Box>
+            <Typography variant="h4" component="h1" gutterBottom>
+              Welcome back, {getDisplayName()}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Student Dashboard • {student.rollNumber}
+            </Typography>
+          </Box>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={handleRefresh}
+            size="small"
+          >
+            Refresh
+          </Button>
+        </Box>
       </Box>
 
       {/* Dashboard Content */}
-      <Box sx={{ p: 4 }}>
-        <Typography variant="h5" component="h2" gutterBottom>
-          Academic Overview
-        </Typography>
-        
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            flexWrap: 'wrap', 
-            gap: 3, 
-            mt: 2 
-          }}
-        >
-          <Box sx={{ flex: '1 1 300px', minWidth: '250px' }}>
-            <Paper sx={{ p: 3, textAlign: 'center', height: '100%' }}>
-              <BookIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                My Courses
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={2}>
-                View enrolled courses and schedules
-              </Typography>
-              <Button variant="contained" size="small">
-                View Courses
-              </Button>
-            </Paper>
-          </Box>
-          
-          <Box sx={{ flex: '1 1 300px', minWidth: '250px' }}>
-            <Paper sx={{ p: 3, textAlign: 'center', height: '100%' }}>
-              <AssignmentIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                Assignments
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={2}>
-                Pending assignments and submissions
-              </Typography>
-              <Button variant="contained" size="small">
-                View Tasks
-              </Button>
-            </Paper>
-          </Box>
-          
-          <Box sx={{ flex: '1 1 300px', minWidth: '250px' }}>
-            <Paper sx={{ p: 3, textAlign: 'center', height: '100%' }}>
-              <GradeIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                Grades
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={2}>
-                Academic performance and results
-              </Typography>
-              <Button variant="contained" size="small">
-                View Grades
-              </Button>
-            </Paper>
-          </Box>
-          
-          <Box sx={{ flex: '1 1 300px', minWidth: '250px' }}>
-            <Paper sx={{ p: 3, textAlign: 'center', height: '100%' }}>
-              <PaymentIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                Fee Status
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={2}>
-                Payment status and history
-              </Typography>
-              <Button variant="contained" size="small">
-                View Fees
-              </Button>
-            </Paper>
-          </Box>
-        </Box>
+      <Box sx={{ px: 4, pb: 4 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          {/* Student Profile */}
+          <StudentProfile student={student} />
 
-        {/* Additional Content */}
-        <Box sx={{ mt: 4 }}>
-          <Paper sx={{ p: 4 }}>
+          {/* Academic Metrics */}
+          {metrics && (
+            <StudentMetricsComponent metrics={metrics} />
+          )}
+
+          {/* Quick Actions */}
+          <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Recent Activities
+              Quick Actions
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Your recent academic activities and updates will be displayed here.
-            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+              <Box sx={{ flex: '1 1 200px', minWidth: '200px', maxWidth: '300px' }}>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  startIcon={<GradeIcon />}
+                  onClick={handleNavigateToPerformance}
+                  sx={{ py: 2 }}
+                >
+                  View Performance
+                </Button>
+              </Box>
+              <Box sx={{ flex: '1 1 200px', minWidth: '200px', maxWidth: '300px' }}>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  startIcon={<PaymentIcon />}
+                  onClick={handleNavigateToFees}
+                  sx={{ py: 2 }}
+                >
+                  View Fees
+                </Button>
+              </Box>
+            </Box>
           </Paper>
+
+          {/* Recent Activity */}
+          <RecentActivity 
+            recentPerformances={recentPerformances}
+            recentFees={recentFees}
+          />
         </Box>
       </Box>
     </Layout>

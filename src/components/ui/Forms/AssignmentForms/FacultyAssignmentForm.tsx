@@ -116,9 +116,8 @@ export const FacultyAssignmentForm: React.FC<FacultyAssignmentFormProps> = ({
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               {selectedStudent.assignedFaculties.map((assignment) => {
-                const faculty = assignment.faculty || faculties.find(f => f.id === assignment.facultyId);
-                const facultyName = faculty 
-                  ? `${faculty.fullName} - ${faculty.subject}`
+                const facultyName = assignment.fullName 
+                  ? `${assignment.fullName} - ${assignment.subject}`
                   : 'Unknown Faculty';
                 
                 return (

@@ -47,7 +47,7 @@ import { apiService } from '../../services/api';
 import { useAdminPermissions } from '../../hooks/useAdminPermissions';
 import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../hooks/useAuth';
-import type { Faculty, Student } from '../../types/user';
+import type { Faculty } from '../../types/user';
 import type { FacultyFormData } from '../../types/forms';
 import type { Column } from '../../types/components';
 import type { FacultyFilters } from '../../types/api';
@@ -80,7 +80,6 @@ interface FacultyDetailViewProps {
   onClose: () => void;
   onEdit: (faculty: Faculty) => void;
   onDelete: (faculty: Faculty) => void;
-  students: Student[];
 }
 
 const FacultyDetailView: React.FC<FacultyDetailViewProps> = ({
@@ -88,7 +87,6 @@ const FacultyDetailView: React.FC<FacultyDetailViewProps> = ({
   onClose,
   onEdit,
   onDelete,
-  students,
 }) => {
   const { canManageUsers } = useAdminPermissions();
 
@@ -96,10 +94,8 @@ const FacultyDetailView: React.FC<FacultyDetailViewProps> = ({
     return new Date(dateString).toLocaleDateString();
   };
 
-  // Get assigned students for this faculty
-  const assignedStudents = students.filter(student => 
-    student.assignedFaculties?.some(assignment => assignment.facultyId === faculty.id)
-  );
+  // Get assigned students for this faculty from the faculty object
+  const assignedStudents = faculty.assignedStudents?.filter(student => student.isActive) || [];
 
   return (
     <Box sx={{ p: 3 }}>
@@ -288,8 +284,8 @@ const FacultyDetailView: React.FC<FacultyDetailViewProps> = ({
                 {assignedStudents.length > 0 ? (
                   assignedStudents.map((student) => (
                     <Chip
-                      key={student.id}
-                      label={`${student.fullName} (${student.rollNumber})`}
+                      key={student.studentId}
+                      label={`${student.studentName} (${student.studentRollNumber})`}
                       variant="outlined"
                       size="small"
                       color="primary"
@@ -320,7 +316,7 @@ export const FacultyManagement: React.FC = () => {
   // Data states
   const [allFaculties, setAllFaculties] = useState<Faculty[]>([]);
   const [faculties, setFaculties] = useState<Faculty[]>([]);
-  const [students, setStudents] = useState<Student[]>([]);
+
   const [totalFaculties, setTotalFaculties] = useState(0);
 
   // Loading states
@@ -439,18 +435,7 @@ export const FacultyManagement: React.FC = () => {
     }
   }, [isAuthenticated]);
 
-  const loadStudents = useCallback(async () => {
-    try {
-      const response = await apiService.getStudents();
-      // Backend returns paginated response for students
-      const validStudents = response?.data ? response.data.filter(student => {
-        return student && typeof student === 'object' && student.id;
-      }) : [];
-      setStudents(validStudents);
-    } catch (err) {
-      setStudents([]);
-    }
-  }, []);
+
 
   // Effects
   useEffect(() => {
@@ -462,9 +447,7 @@ export const FacultyManagement: React.FC = () => {
     };
   }, [loadFaculties]);
 
-  useEffect(() => {
-    loadStudents();
-  }, [loadStudents]);
+
 
   // Handlers
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -914,7 +897,6 @@ export const FacultyManagement: React.FC = () => {
               onClose={() => setDetailModalOpen(false)}
               onEdit={handleEditFaculty}
               onDelete={handleDeleteFaculty}
-              students={students}
             />
           )}
         </Modal>

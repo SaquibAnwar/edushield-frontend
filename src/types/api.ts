@@ -55,6 +55,10 @@ export interface ParentFilters {
   search?: string;
   parentType?: ParentType;
   isActive?: boolean;
+  city?: string;
+  state?: string;
+  isEmergencyContact?: boolean;
+  isAuthorizedToPickup?: boolean;
   page?: number;
   limit?: number;
   sortBy?: string;

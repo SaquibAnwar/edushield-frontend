@@ -67,6 +67,7 @@ export interface ParentFormData {
   parentType: ParentType;
   isEmergencyContact: boolean;
   isAuthorizedToPickup: boolean;
+  userId?: string;
 }
 
 // Performance form data

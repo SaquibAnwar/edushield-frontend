@@ -90,8 +90,22 @@ export interface Faculty {
   fullName: string;
   age: number;
   yearsOfService: number;
+  assignedStudents: AssignedStudent[];
   createdAt: string;
   updatedAt: string;
+}
+
+// Assigned Student interface for Faculty
+export interface AssignedStudent {
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+  studentRollNumber: string;
+  studentGrade?: string;
+  studentSection?: string;
+  assignedDate: string;
+  isActive: boolean;
+  notes?: string;
 }
 
 // Parent entity interface
@@ -176,12 +190,14 @@ export interface StudentFee {
 // Faculty Assignment interface
 export interface FacultyAssignment {
   id: string;
-  studentId: string;
-  facultyId: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  department: string;
+  subject: string;
   assignedDate: string;
-  isActive: boolean;
+  isActive?: boolean;
   notes?: string;
-  faculty?: Faculty;
 }
 
 // Parent Student relationship interface
