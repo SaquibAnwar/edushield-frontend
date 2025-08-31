@@ -41,6 +41,7 @@ export interface FacultyFormData {
   subject: string;
   hireDate: string;
   userId?: string;
+  isActive?: boolean;
 }
 
 // Parent form data - aligned with backend CreateParentRequest

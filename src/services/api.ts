@@ -13,7 +13,6 @@ import type {
 import type {
   PaginatedResponse,
   StudentFilters,
-  FacultyFilters,
   ParentFilters,
   PerformanceFilters,
   FeeFilters,
@@ -322,9 +321,8 @@ export class ApiService {
   }
 
   // Faculty endpoints
-  async getFaculties(filters?: FacultyFilters): Promise<Faculty[]> {
-    const params = this.buildQueryParams(filters);
-    return this.client.get<Faculty[]>('/faculty', { params });
+  async getFaculties(): Promise<Faculty[]> {
+    return this.client.get<Faculty[]>('/faculty');
   }
 
   async getFaculty(id: string): Promise<Faculty> {

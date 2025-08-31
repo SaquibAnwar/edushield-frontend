@@ -66,6 +66,7 @@ const FacultyForm: React.FC<FormProps<FacultyFormData>> = ({
             subject: '',
             hireDate: new Date().toISOString().split('T')[0],
             userId: '',
+            isActive: true,
         },
         mode: 'onChange',
     });
@@ -381,6 +382,29 @@ const FacultyForm: React.FC<FormProps<FacultyFormData>> = ({
                         />
                     </Grid>
 
+                    <Grid item xs={12} sm={6}>
+                        <Controller
+                            name="isActive"
+                            control={control}
+                            render={({ field }) => (
+                                <FormControl fullWidth error={!!errors.isActive} disabled={isFormDisabled}>
+                                    <InputLabel>Status</InputLabel>
+                                    <Select 
+                                        {...field} 
+                                        label="Status"
+                                        value={field.value !== undefined ? String(field.value) : 'true'}
+                                        onChange={(e) => field.onChange(e.target.value === 'true')}
+                                    >
+                                        <MenuItem value="true">Active</MenuItem>
+                                        <MenuItem value="false">Inactive</MenuItem>
+                                    </Select>
+                                    {errors.isActive && (
+                                        <FormHelperText>{errors.isActive.message}</FormHelperText>
+                                    )}
+                                </FormControl>
+                            )}
+                        />
+                    </Grid>
 
                 </Grid>
 
