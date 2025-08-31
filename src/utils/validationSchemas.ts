@@ -149,6 +149,11 @@ export const facultyFormSchema = yup.object({
   userId: yup
     .string()
     .optional(),
+  
+  isActive: yup
+    .boolean()
+    .optional()
+    .default(true),
 });
 
 // Parent form validation schema - matches CreateParentRequest

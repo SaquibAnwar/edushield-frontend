@@ -25,7 +25,8 @@ import {
   Grade as GradeIcon,
   FamilyRestroom as FamilyIcon,
   AccountCircle as ProfileIcon,
-  BugReport as TestIcon
+  BugReport as TestIcon,
+  Work as WorkIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../../hooks/useAuth';
 import { useSystemSettings } from '../../../contexts/SystemSettingsContext';
@@ -136,6 +137,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             icon: <DataIcon />,
             path: '/admin/student-data',
             onClick: () => handleNavigation('/admin/student-data')
+          },
+          {
+            label: 'Faculty Management',
+            icon: <WorkIcon />,
+            path: '/admin/faculty',
+            onClick: () => handleNavigation('/admin/faculty')
           },
           {
             label: 'Academic Management',

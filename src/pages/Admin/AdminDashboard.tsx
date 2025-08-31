@@ -339,6 +339,27 @@ export const AdminDashboard: React.FC = () => {
                 transition: 'transform 0.2s ease-in-out',
                 '&:hover': { transform: 'translateY(-2px)' }
               }}
+              onClick={() => navigate('/admin/faculty')}
+            >
+              <CardContent sx={{ textAlign: 'center', py: 4 }}>
+                <SupervisorAccountIcon sx={{ fontSize: 48, color: 'warning.main', mb: 2 }} />
+                <Typography variant="h6" gutterBottom>
+                  Faculty Management
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Comprehensive faculty CRUD operations
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <Card 
+              sx={{ 
+                cursor: 'pointer',
+                transition: 'transform 0.2s ease-in-out',
+                '&:hover': { transform: 'translateY(-2px)' }
+              }}
               onClick={() => navigate('/admin/settings')}
             >
               <CardContent sx={{ textAlign: 'center', py: 4 }}>

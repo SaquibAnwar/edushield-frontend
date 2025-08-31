@@ -113,6 +113,7 @@ export interface CreateFacultyRequest {
   subject: string;
   hireDate: Date;
   userId?: string;
+  isActive?: boolean;
 }
 
 export interface CreateParentRequest {
