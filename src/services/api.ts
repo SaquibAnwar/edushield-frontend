@@ -282,9 +282,9 @@ export class ApiService {
   }
 
   // Student endpoints
-  async getStudents(filters?: StudentFilters): Promise<Student[]> {
+  async getStudents(filters?: StudentFilters): Promise<PaginatedResponse<Student>> {
     const params = this.buildQueryParams(filters);
-    return this.client.get<Student[]>('/students', { params });
+    return this.client.get<PaginatedResponse<Student>>('/students', { params });
   }
 
   async getStudent(id: string): Promise<Student> {

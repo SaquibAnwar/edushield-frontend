@@ -48,6 +48,17 @@ export interface FacultyFilters {
   sortOrder?: 'asc' | 'desc';
 }
 
+// Paginated response interface
+export interface PaginatedResponse<T> {
+  data: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 export interface ParentFilters {
   search?: string;
   parentType?: ParentType;
@@ -181,7 +192,9 @@ export interface BulkUpdateRequest<T> {
 export interface AssignFacultyToStudentRequest {
   studentId: string;
   facultyId: string;
+  subject?: string;
   notes?: string;
+  isActive: boolean;
 }
 
 export interface AssignParentToStudentRequest {
@@ -191,6 +204,7 @@ export interface AssignParentToStudentRequest {
   isPrimaryContact: boolean;
   isAuthorizedToPickup: boolean;
   isEmergencyContact: boolean;
+  isActive: boolean;
   notes?: string;
 }
 

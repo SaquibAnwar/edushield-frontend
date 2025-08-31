@@ -17,6 +17,7 @@ import {
   People as PeopleIcon,
   School as SchoolIcon,
   Assessment as ReportsIcon,
+  DataUsage as DataIcon,
   Settings as SettingsIcon,
   Dashboard as DashboardIcon,
   Assignment as AssignmentIcon,
@@ -129,6 +130,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             icon: <SchoolIcon />,
             path: '/admin/students',
             onClick: () => handleNavigation('/admin/students')
+          },
+          {
+            label: 'Student Data Management',
+            icon: <DataIcon />,
+            path: '/admin/student-data',
+            onClick: () => handleNavigation('/admin/student-data')
           },
           {
             label: 'Academic Management',

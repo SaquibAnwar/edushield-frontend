@@ -7,3 +7,4 @@ export { Modal } from './Modal';
 export { SuccessFeedback } from './SuccessFeedback';
 export { Toast } from './Toast';
 export { StudentForm, FacultyForm, ParentForm } from './Forms';
+export { BulkOperationsDialog } from './BulkOperations';

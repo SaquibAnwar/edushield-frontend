@@ -55,7 +55,7 @@ const StudentForm: React.FC<StudentFormProps> = ({
   const [isRetrying, setIsRetrying] = React.useState(false);
   
   const { handleError, isRetryable, formatForDisplay } = useErrorHandler();
-  const { showSuccess: showSuccessToast, showError: showErrorToast } = useToast();
+  const { showError: showErrorToast } = useToast();
 
   // Helper function to format date for HTML date input (YYYY-MM-DD)
   const formatDateForInput = (dateValue: string | Date | undefined): string => {

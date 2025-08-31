@@ -69,18 +69,18 @@ export const AdminAccessTest: React.FC = () => {
               {isAuthenticated ? 'Authenticated' : 'Not Authenticated'}
             </Typography>
           </Box>
-          
+
           {user && (
             <Box sx={{ mt: 2 }}>
               <Typography variant="subtitle2" gutterBottom>User Information:</Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
                 <Chip icon={<PersonIcon />} label={`Name: ${user.name}`} />
                 <Chip label={`Email: ${user.email}`} />
-                <Chip 
+                <Chip
                   label={`Role: ${getUserRoleDisplayName()}`}
                   color={hasAdminAccess ? 'success' : 'default'}
                 />
-                <Chip 
+                <Chip
                   label={`Status: ${user.isActive ? 'Active' : 'Inactive'}`}
                   color={user.isActive ? 'success' : 'error'}
                 />
@@ -96,29 +96,29 @@ export const AdminAccessTest: React.FC = () => {
           <Typography variant="h6" gutterBottom>
             Admin Permissions
           </Typography>
-          
+
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <PermissionRow 
+            <PermissionRow
               label="Has Admin Access"
               hasPermission={hasAdminAccess}
               description="Can access admin-only features"
             />
-            <PermissionRow 
+            <PermissionRow
               label="Can Access CRUD Forms"
               hasPermission={canAccessCRUDForms}
               description="Can create, read, update, delete user records"
             />
-            <PermissionRow 
+            <PermissionRow
               label="Can Manage Users"
               hasPermission={canManageUsers}
               description="Can perform user management operations"
             />
-            <PermissionRow 
+            <PermissionRow
               label="Can Access Admin Dashboard"
               hasPermission={canAccessAdminDashboard}
               description="Can view admin dashboard"
             />
-            <PermissionRow 
+            <PermissionRow
               label="Can Access Admin Management"
               hasPermission={canAccessAdminManagement}
               description="Can access admin management pages"
@@ -133,8 +133,8 @@ export const AdminAccessTest: React.FC = () => {
           <Typography variant="h6" gutterBottom>
             Permission Validation
           </Typography>
-          
-          <Alert 
+
+          <Alert
             severity={validationResult.hasAccess ? 'success' : 'error'}
             sx={{ mb: 2 }}
           >
@@ -159,7 +159,7 @@ export const AdminAccessTest: React.FC = () => {
           <Typography variant="h6" gutterBottom>
             Route Information
           </Typography>
-          
+
           <Typography variant="body2" sx={{ mb: 1 }}>
             <strong>Current Path:</strong> {window.location.pathname}
           </Typography>
@@ -169,15 +169,15 @@ export const AdminAccessTest: React.FC = () => {
           <Typography variant="body2" sx={{ mb: 2 }}>
             <strong>Recommended Redirect:</strong> {getRoleBasedRedirect()}
           </Typography>
-          
+
           <Divider sx={{ my: 2 }} />
-          
+
           <Typography variant="subtitle2" gutterBottom>
             Available Admin Routes:
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             {PermissionService.getAdminRoutes().map(route => (
-              <Chip 
+              <Chip
                 key={route}
                 label={route}
                 size="small"
@@ -194,7 +194,7 @@ export const AdminAccessTest: React.FC = () => {
           <Typography variant="h6" gutterBottom>
             Test Actions
           </Typography>
-          
+
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
             <Button
               variant="outlined"
@@ -251,7 +251,7 @@ const PermissionRow: React.FC<PermissionRowProps> = ({ label, hasPermission, des
         {description}
       </Typography>
     </Box>
-    <Chip 
+    <Chip
       label={hasPermission ? 'Allowed' : 'Denied'}
       color={hasPermission ? 'success' : 'error'}
       size="small"
