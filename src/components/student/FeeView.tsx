@@ -318,7 +318,7 @@ const FeeView: React.FC = () => {
   return (
     <Layout>
       {/* Breadcrumbs */}
-      <Box sx={{ p: 4, pb: 2 }}>
+      <Box sx={{ px: 4, pt: 4, pb: 2 }}>
         <Breadcrumbs aria-label="breadcrumb">
           <Link
             underline="hover"
@@ -344,14 +344,14 @@ const FeeView: React.FC = () => {
       </Box>
 
       {/* Header */}
-      <Box sx={{ px: 4, pb: 2 }}>
+      <Box sx={{ px: 4, pb: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box>
             <Typography variant="h4" component="h1" gutterBottom>
               Fee Management
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              {student ? `${student.fullName} • ${student.rollNumber}` : 'Fee Overview'}
+              {student ? `${student.fullName} • ${student.rollNumber}` : 'View your fee records, payment status, and financial information.'}
             </Typography>
           </Box>
           <Button
@@ -367,13 +367,7 @@ const FeeView: React.FC = () => {
 
       {/* Content */}
       <Box sx={{ px: 4, pb: 4 }}>
-        {!student && (
-          <Alert severity="info" sx={{ mb: 3 }}>
-            <Typography variant="body2">
-              Student profile not found. Showing all available fee data.
-            </Typography>
-          </Alert>
-        )}
+
 
         {/* Overdue Alert */}
         {feeStats.overdueCount > 0 && (

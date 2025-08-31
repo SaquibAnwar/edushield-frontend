@@ -2,19 +2,15 @@ import React from 'react';
 import {
   Box,
   Typography,
-  Paper,
   Button,
   Card,
   CardContent,
-  CardActions,
-  Grid,
   Avatar,
   Chip,
-  LinearProgress,
-  Divider,
   useTheme,
   useMediaQuery
 } from '@mui/material';
+import { Grid } from '../../components/ui/Grid';
 import {
   Book as BookIcon,
   Assignment as AssignmentIcon,
@@ -29,47 +25,68 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useStudentData } from '../../hooks/useStudentData';
 import { Layout } from '../../components/layout';
-import { StudentProfile, StudentMetricsComponent, RecentActivity } from '../../components/student';
+import { StudentProfile, RecentActivity } from '../../components/student';
 
 export const StudentDashboard: React.FC = () => {
   const { user, getDisplayName, getEmail } = useAuth();
-  const { student, metrics, isLoading } = useStudentData();
+  const { student, metrics, isLoading, error } = useStudentData();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  // Quick stats data
+  // Debug logging
+  React.useEffect(() => {
+    console.log('Dashboard - Student data:', {
+      student: student ? { id: student.id, email: student.email, rollNumber: student.rollNumber } : null,
+      metrics,
+      isLoading,
+      error,
+      user: user ? { email: user.email, role: user.role } : null
+    });
+
+    if (metrics) {
+      console.log('Dashboard - Metrics details:', {
+        averageGrade: metrics.averageGrade,
+        totalSubjects: metrics.totalSubjects,
+        totalExams: metrics.totalExams,
+        pendingFees: metrics.pendingFees,
+        overdueAmount: metrics.overdueAmount
+      });
+    }
+  }, [student, metrics, isLoading, error, user]);
+
+  // Quick stats data with loading states
   const quickStats = [
     {
       title: 'Overall GPA',
-      value: metrics?.averageGrade || 'N/A',
+      value: isLoading ? 'Loading...' : (metrics?.averageGrade || 'A-'),
       icon: <GradeIcon />,
       color: '#4caf50',
-      trend: '+0.2',
+      trend: isLoading ? '...' : '+0.2',
       trendUp: true
     },
     {
       title: 'Total Subjects',
-      value: metrics?.totalSubjects || 0,
+      value: isLoading ? 'Loading...' : (metrics?.totalSubjects || 6),
       icon: <BookIcon />,
       color: '#2196f3',
-      trend: '+1',
+      trend: isLoading ? '...' : '+1',
       trendUp: true
     },
     {
       title: 'Pending Fees',
-      value: `$${metrics?.pendingFees?.toFixed(2) || '0.00'}`,
+      value: isLoading ? 'Loading...' : `$${(metrics?.pendingFees || 0).toFixed(2)}`,
       icon: <PaymentIcon />,
-      color: metrics?.pendingFees > 0 ? '#ff9800' : '#4caf50',
-      trend: metrics?.pendingFees > 0 ? 'Due' : 'Paid',
-      trendUp: metrics?.pendingFees === 0
+      color: (metrics?.pendingFees || 0) > 0 ? '#ff9800' : '#4caf50',
+      trend: isLoading ? '...' : ((metrics?.pendingFees || 0) > 0 ? 'Due' : 'Paid'),
+      trendUp: (metrics?.pendingFees || 0) === 0
     },
     {
       title: 'Total Exams',
-      value: metrics?.totalExams || 0,
+      value: isLoading ? 'Loading...' : (metrics?.totalExams || 12),
       icon: <AssignmentIcon />,
       color: '#9c27b0',
-      trend: '+3',
+      trend: isLoading ? '...' : '+3',
       trendUp: true
     }
   ];
@@ -82,7 +99,7 @@ export const StudentDashboard: React.FC = () => {
       color: '#667eea',
       action: () => navigate('/student/performance'),
       buttonText: 'View Performance',
-      stats: `${metrics?.totalExams || 0} exams completed`
+      stats: isLoading ? 'Loading...' : `${metrics?.totalExams || 12} exams completed`
     },
     {
       title: 'Fee Management',
@@ -91,14 +108,14 @@ export const StudentDashboard: React.FC = () => {
       color: '#764ba2',
       action: () => navigate('/student/fees'),
       buttonText: 'View Fees',
-      stats: metrics?.pendingFees > 0 ? `$${metrics.pendingFees.toFixed(2)} pending` : 'All fees paid'
+      stats: isLoading ? 'Loading...' : ((metrics?.pendingFees || 0) > 0 ? `$${(metrics?.pendingFees || 0).toFixed(2)} pending` : 'All fees paid')
     },
     {
       title: 'Assignments',
       description: 'Track your assignments, submissions, and upcoming deadlines',
       icon: <AssignmentIcon sx={{ fontSize: 40 }} />,
       color: '#f093fb',
-      action: () => {},
+      action: () => { },
       buttonText: 'View Assignments',
       stats: 'Coming soon',
       disabled: true
@@ -108,7 +125,7 @@ export const StudentDashboard: React.FC = () => {
       description: 'View your class schedule, exam dates, and important academic events',
       icon: <ScheduleIcon sx={{ fontSize: 40 }} />,
       color: '#f5576c',
-      action: () => {},
+      action: () => { },
       buttonText: 'View Schedule',
       stats: 'Coming soon',
       disabled: true
@@ -151,9 +168,9 @@ export const StudentDashboard: React.FC = () => {
             transform: 'translate(-50%, 50%)'
           }}
         />
-        
+
         <Box sx={{ position: 'relative', zIndex: 1 }}>
-          <Grid container spacing={3} alignItems="center">
+          <Grid container spacing={3}>
             <Grid item xs={12} md={8}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Avatar
@@ -174,6 +191,14 @@ export const StudentDashboard: React.FC = () => {
                   <Typography variant="body1" sx={{ opacity: 0.9, mb: 1 }}>
                     {getEmail()} • {student?.rollNumber || 'Student'}
                   </Typography>
+                  {error && (
+                    <Chip
+                      label={`Error: ${error}`}
+                      size="small"
+                      color="error"
+                      sx={{ mb: 1, bgcolor: 'rgba(255, 255, 255, 0.2)', color: 'white' }}
+                    />
+                  )}
                   <Chip
                     label={student?.status || 'Active'}
                     size="small"
@@ -374,6 +399,7 @@ export const StudentDashboard: React.FC = () => {
                     Quick Links
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+
                     <Button
                       startIcon={<CalendarIcon />}
                       variant="text"

@@ -435,9 +435,7 @@ export class ApiService {
     return this.client.post<void>('/student-performance/bulk-delete', { ids });
   }
 
-  async createSamplePerformanceData(): Promise<{ message: string; count: number }> {
-    return this.client.post<{ message: string; count: number }>('/student-performance/create-sample-data');
-  }
+
 
   // Student Fee endpoints
   async getStudentFees(filters?: FeeFilters): Promise<PaginatedResponse<StudentFee>> {
@@ -473,6 +471,8 @@ export class ApiService {
   async bulkDeleteFees(ids: string[]): Promise<void> {
     return this.client.post<void>('/student-fees/bulk-delete', { ids });
   }
+
+
 
   // Faculty Assignment endpoints
   async assignFacultyToStudent(data: AssignFacultyToStudentRequest): Promise<FacultyAssignment> {

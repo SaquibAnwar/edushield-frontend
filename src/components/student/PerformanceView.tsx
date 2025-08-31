@@ -356,7 +356,7 @@ const PerformanceView: React.FC = () => {
   return (
     <Layout>
       {/* Breadcrumbs */}
-      <Box sx={{ p: 4, pb: 2 }}>
+      <Box sx={{ px: 4, pt: 4, pb: 2 }}>
         <Breadcrumbs aria-label="breadcrumb">
           <Link
             underline="hover"
@@ -382,14 +382,14 @@ const PerformanceView: React.FC = () => {
       </Box>
 
       {/* Header */}
-      <Box sx={{ px: 4, pb: 2 }}>
+      <Box sx={{ px: 4, pb: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box>
             <Typography variant="h4" component="h1" gutterBottom>
               Academic Performance
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              {student ? `${student.fullName} • ${student.rollNumber}` : 'Performance Overview'}
+              {student ? `${student.fullName} • ${student.rollNumber}` : 'Track your academic progress, exam results, and performance metrics.'}
             </Typography>
           </Box>
           <Button
@@ -405,13 +405,7 @@ const PerformanceView: React.FC = () => {
 
       {/* Content */}
       <Box sx={{ px: 4, pb: 4 }}>
-        {!student && (
-          <Alert severity="info" sx={{ mb: 3 }}>
-            <Typography variant="body2">
-              Student profile not found. Showing all available performance data.
-            </Typography>
-          </Alert>
-        )}
+
         {/* Filters */}
         <Paper sx={{ p: 3, mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -505,23 +499,10 @@ const PerformanceView: React.FC = () => {
                   variant="contained"
                   color="primary"
                   size="small"
-                  onClick={async () => {
-                    try {
-                      setIsLoading(true);
-                      console.log('Creating sample performance data...');
-                      const result = await apiService.createSamplePerformanceData();
-                      console.log('Sample data created:', result.message);
-                      await fetchPerformances(); // Refresh data
-                    } catch (error) {
-                      console.error('Failed to create sample data:', error);
-                      setError(error instanceof Error ? error.message : 'Failed to create sample data');
-                    } finally {
-                      setIsLoading(false);
-                    }
-                  }}
+                  onClick={handleRefresh}
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Creating...' : 'Create Sample Data (Dev Only)'}
+                  Refresh Data
                 </Button>
               </Box>
             ) : ''}

@@ -257,7 +257,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ...commonItems,
           { label: '', icon: null, divider: true },
           {
-            label: 'My Performance',
+            label: 'Performance',
             icon: <GradeIcon />,
             path: '/student/performance',
             onClick: () => handleNavigation('/student/performance')
