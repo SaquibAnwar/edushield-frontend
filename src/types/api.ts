@@ -14,12 +14,15 @@ export interface ApiError {
   code?: string;
 }
 
+// Paginated response interface
 export interface PaginatedResponse<T> {
   data: T[];
-  total: number;
+  totalCount: number;
   page: number;
-  limit: number;
+  pageSize: number;
   totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
 // Filter interfaces
@@ -46,17 +49,6 @@ export interface FacultyFilters {
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
-}
-
-// Paginated response interface
-export interface PaginatedResponse<T> {
-  data: T[];
-  totalCount: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
 }
 
 export interface ParentFilters {
@@ -163,11 +155,7 @@ export interface CreateFeeRequest {
   feeType: FeeType;
   term: string;
   totalAmount: number;
-  amountPaid: number;
-  paymentStatus: PaymentStatus;
   dueDate: string;
-  lastPaymentDate?: string;
-  fineAmount: number;
   notes?: string;
 }
 

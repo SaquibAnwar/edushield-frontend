@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-import { ExamType, FeeType, PaymentStatus } from '../types/user';
 
 // Common validation patterns
 const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
@@ -294,9 +293,9 @@ export const performanceFormSchema = yup.object({
     .max(50, 'Subject must not exceed 50 characters'),
   
   examType: yup
-    .string()
+    .number()
     .required('Exam type is required')
-    .oneOf(Object.values(ExamType), 'Please select a valid exam type'),
+    .oneOf([0, 1, 2, 3, 4, 5, 6, 7], 'Please select a valid exam type'),
   
   examDate: yup
     .string()
@@ -338,9 +337,9 @@ export const feeFormSchema = yup.object({
     .required('Student selection is required'),
   
   feeType: yup
-    .string()
+    .number()
     .required('Fee type is required')
-    .oneOf(Object.values(FeeType), 'Please select a valid fee type'),
+    .oneOf([0, 1, 2, 3, 4], 'Please select a valid fee type'),
   
   term: yup
     .string()
@@ -367,9 +366,9 @@ export const feeFormSchema = yup.object({
     }),
   
   paymentStatus: yup
-    .string()
+    .number()
     .required('Payment status is required')
-    .oneOf(Object.values(PaymentStatus), 'Please select a valid payment status'),
+    .oneOf([0, 1, 2, 3], 'Please select a valid payment status'),
   
   dueDate: yup
     .string()
@@ -424,14 +423,14 @@ export const searchFormSchema = yup.object({
       .max(50, 'Subject must not exceed 50 characters'),
     
     feeType: yup
-      .string()
+      .number()
       .optional()
-      .oneOf([...Object.values(FeeType), ''], 'Please select a valid fee type'),
+      .oneOf([0, 1, 2, 3, 4, undefined], 'Please select a valid fee type'),
     
     paymentStatus: yup
-      .string()
+      .number()
       .optional()
-      .oneOf([...Object.values(PaymentStatus), ''], 'Please select a valid payment status'),
+      .oneOf([0, 1, 2, 3, undefined], 'Please select a valid payment status'),
     
     dateFrom: yup
       .string()

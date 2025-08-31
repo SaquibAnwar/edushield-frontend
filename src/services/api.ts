@@ -408,19 +408,19 @@ export class ApiService {
   }
 
   async createPerformance(data: CreatePerformanceRequest): Promise<StudentPerformance> {
-    // Convert Date objects to ISO strings for backend if examDate is a Date
+    // Convert Date objects to ISO strings for backend
     const requestData = { ...data };
-    if (typeof requestData.examDate !== 'string') {
-      requestData.examDate = dateConverter.formatForBackend(new Date(requestData.examDate));
-    }
+    // Always convert examDate to proper ISO format
+    requestData.examDate = dateConverter.formatForBackend(new Date(requestData.examDate));
     return this.client.post<StudentPerformance>('/student-performance', requestData);
   }
 
   async updatePerformance(id: string, data: UpdatePerformanceRequest): Promise<StudentPerformance> {
-    // Convert Date objects to ISO strings for backend if examDate exists and is a Date
+    // Convert date strings to proper ISO format for backend
     const requestData = { ...data };
-    if (requestData.examDate && typeof requestData.examDate !== 'string') {
-      requestData.examDate = dateConverter.formatForBackend(new Date(requestData.examDate));
+    if (requestData.examDate) {
+      // Convert form date string (YYYY-MM-DD) to proper ISO format
+      requestData.examDate = dateConverter.formatForBackend(dateConverter.formDateToDateTime(requestData.examDate));
     }
     return this.client.put<StudentPerformance>(`/student-performance/${id}`, requestData);
   }
@@ -446,23 +446,17 @@ export class ApiService {
   async createFee(data: CreateFeeRequest): Promise<StudentFee> {
     // Convert Date objects to ISO strings for backend
     const requestData = { ...data };
-    if (typeof requestData.dueDate !== 'string') {
-      requestData.dueDate = dateConverter.formatForBackend(new Date(requestData.dueDate));
-    }
-    if (requestData.lastPaymentDate && typeof requestData.lastPaymentDate !== 'string') {
-      requestData.lastPaymentDate = dateConverter.formatForBackend(new Date(requestData.lastPaymentDate));
-    }
+    // Always convert dueDate to proper ISO format
+    requestData.dueDate = dateConverter.formatForBackend(new Date(requestData.dueDate));
     return this.client.post<StudentFee>('/student-fees', requestData);
   }
 
   async updateFee(id: string, data: UpdateFeeRequest): Promise<StudentFee> {
-    // Convert Date objects to ISO strings for backend if they exist
+    // Convert date strings to proper ISO format for backend
     const requestData = { ...data };
-    if (requestData.dueDate && typeof requestData.dueDate !== 'string') {
-      requestData.dueDate = dateConverter.formatForBackend(new Date(requestData.dueDate));
-    }
-    if (requestData.lastPaymentDate && typeof requestData.lastPaymentDate !== 'string') {
-      requestData.lastPaymentDate = dateConverter.formatForBackend(new Date(requestData.lastPaymentDate));
+    if (requestData.dueDate) {
+      // Convert form date string (YYYY-MM-DD) to proper ISO format
+      requestData.dueDate = dateConverter.formatForBackend(dateConverter.formDateToDateTime(requestData.dueDate));
     }
     return this.client.put<StudentFee>(`/student-fees/${id}`, requestData);
   }

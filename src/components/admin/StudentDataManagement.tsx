@@ -198,10 +198,20 @@ export const StudentDataManagement: React.FC = () => {
         limit: pageSize,
       };
       const response = await apiService.getStudentPerformances(filters);
-      setPerformances(Array.isArray(response.data) ? response.data : []);
-      setTotalCount(response.totalCount || 0);
+      
+      // Debug logging
+      console.log('Performance API Response:', JSON.stringify(response, null, 2));
+      
+      // Handle paginated response
+      const data = Array.isArray(response.data) ? response.data : [];
+      const count = response.totalCount || 0;
+      console.log('Setting performances (paginated):', JSON.stringify(data, null, 2), 'Total:', count);
+      setPerformances(data);
+      setTotalCount(count);
     } catch (err) {
       console.error('Error loading performances:', err);
+      console.error('Error details:', err);
+      setError(`Failed to load performances: ${err instanceof Error ? err.message : 'Unknown error'}`);
       setPerformances([]);
       setTotalCount(0);
     } finally {
@@ -218,10 +228,20 @@ export const StudentDataManagement: React.FC = () => {
         limit: pageSize,
       };
       const response = await apiService.getStudentFees(filters);
-      setFees(Array.isArray(response.data) ? response.data : []);
-      setTotalCount(response.totalCount || 0);
+      
+      // Debug logging
+      console.log('Fee API Response:', JSON.stringify(response, null, 2));
+      
+      // Handle paginated response
+      const data = Array.isArray(response.data) ? response.data : [];
+      const count = response.totalCount || 0;
+      console.log('Setting fees (paginated):', JSON.stringify(data, null, 2), 'Total:', count);
+      setFees(data);
+      setTotalCount(count);
     } catch (err) {
       console.error('Error loading fees:', err);
+      console.error('Error details:', err);
+      setError(`Failed to load fees: ${err instanceof Error ? err.message : 'Unknown error'}`);
       setFees([]);
       setTotalCount(0);
     } finally {
@@ -699,10 +719,31 @@ export const StudentDataManagement: React.FC = () => {
             onSubmit={async (data: PerformanceFormData) => {
               try {
                 if (selectedPerformance) {
-                  await apiService.updatePerformance(selectedPerformance.id, data);
+                  // For updates, send only fields expected by UpdateStudentPerformanceRequest
+                  const updateData = {
+                    subject: data.subject,
+                    examType: data.examType,
+                    examDate: data.examDate, // Will be converted to ISO format in API service
+                    score: data.score, // Already converted to number by form
+                    maxScore: data.maxScore || undefined,
+                    examTitle: data.examTitle || undefined,
+                    comments: data.comments || undefined,
+                  };
+                  await apiService.updatePerformance(selectedPerformance.id, updateData);
                   showSuccess('Performance Updated', 'Performance record has been updated successfully');
                 } else {
-                  await apiService.createPerformance(data);
+                  // For creation, send all fields expected by CreateStudentPerformanceRequest
+                  const createData = {
+                    studentId: data.studentId, // Should already be a valid GUID string
+                    subject: data.subject,
+                    examType: data.examType,
+                    examDate: data.examDate, // Will be converted to ISO format in API service
+                    score: data.score, // Already converted to number by form
+                    maxScore: data.maxScore || undefined,
+                    examTitle: data.examTitle || undefined,
+                    comments: data.comments || undefined,
+                  };
+                  await apiService.createPerformance(createData);
                   showSuccess('Performance Created', 'Performance record has been created successfully');
                 }
                 setPerformanceModalOpen(false);
@@ -727,17 +768,29 @@ export const StudentDataManagement: React.FC = () => {
             initialData={selectedFee}
             onSubmit={async (data: FeeFormData) => {
               try {
-                // Transform form data to API request format
-                const apiData = {
-                  ...data,
-                  fineAmount: data.fineAmount || 0, // Ensure fineAmount is always a number
-                };
-
                 if (selectedFee) {
-                  await apiService.updateFee(selectedFee.id, apiData);
+                  // For updates, send only fields expected by UpdateStudentFeeRequest
+                  const updateData = {
+                    feeType: data.feeType,
+                    term: data.term,
+                    totalAmount: data.totalAmount,
+                    amountPaid: data.amountPaid || 0,
+                    dueDate: data.dueDate,
+                    notes: data.notes || undefined,
+                  };
+                  await apiService.updateFee(selectedFee.id, updateData);
                   showSuccess('Fee Updated', 'Fee record has been updated successfully');
                 } else {
-                  await apiService.createFee(apiData);
+                  // For creation, send only fields expected by CreateStudentFeeRequest
+                  const createData = {
+                    studentId: data.studentId, // Should already be a valid GUID string
+                    feeType: data.feeType,
+                    term: data.term,
+                    totalAmount: data.totalAmount, // Already converted to number by form
+                    dueDate: data.dueDate, // Will be converted to ISO format in API service
+                    notes: data.notes || undefined,
+                  };
+                  await apiService.createFee(createData);
                   showSuccess('Fee Created', 'Fee record has been created successfully');
                 }
                 setFeeModalOpen(false);

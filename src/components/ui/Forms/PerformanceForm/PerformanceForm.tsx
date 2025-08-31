@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   TextField,
@@ -15,7 +15,7 @@ import { LoadingSpinner } from '../../LoadingSpinner';
 import { ExamType } from '../../../../types/user';
 import type { Student } from '../../../../types/user';
 
-// Form data interface
+// Form data interface - matches backend CreateStudentPerformanceRequest
 interface PerformanceFormData {
   studentId: string;
   subject: string;
@@ -25,6 +25,18 @@ interface PerformanceFormData {
   maxScore: number;
   examTitle?: string;
   comments?: string;
+}
+
+// Internal form state interface with string values for text inputs
+interface PerformanceFormState {
+  studentId: string;
+  subject: string;
+  examType: ExamType;
+  examDate: string;
+  score: string;
+  maxScore: string;
+  examTitle: string;
+  comments: string;
 }
 
 interface PerformanceFormProps {
@@ -42,24 +54,58 @@ export const PerformanceForm: React.FC<PerformanceFormProps> = ({
   onCancel,
   isSubmitting = false,
 }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<PerformanceFormState>({
     studentId: initialData?.studentId || '',
     subject: initialData?.subject || '',
-    examType: initialData?.examType || ExamType.QUIZ,
+    examType: initialData?.examType || ExamType.UnitTest,
     examDate: initialData?.examDate ? initialData.examDate.split('T')[0] : '',
-    score: initialData?.score || 0,
-    maxScore: initialData?.maxScore || 100,
+    score: initialData?.score?.toString() || '',
+    maxScore: initialData?.maxScore?.toString() || '100',
     examTitle: initialData?.examTitle || '',
     comments: initialData?.comments || '',
   });
 
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Update form data when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        studentId: initialData.studentId || '',
+        subject: initialData.subject || '',
+        examType: initialData.examType || ExamType.UnitTest,
+        examDate: initialData.examDate ? initialData.examDate.split('T')[0] : '',
+        score: initialData.score?.toString() || '',
+        maxScore: initialData.maxScore?.toString() || '100',
+        examTitle: initialData.examTitle || '',
+        comments: initialData.comments || '',
+      });
+    } else {
+      // Reset form for new records
+      setFormData({
+        studentId: '',
+        subject: '',
+        examType: ExamType.UnitTest,
+        examDate: '',
+        score: '',
+        maxScore: '100',
+        examTitle: '',
+        comments: '',
+      });
+    }
+  }, [initialData]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setSubmitError(null);
-      await onSubmit(formData);
+      // Convert string values to numbers for submission
+      const submitData = {
+        ...formData,
+        score: parseFloat(formData.score) || 0,
+        maxScore: parseFloat(formData.maxScore) || 100,
+      };
+      await onSubmit(submitData);
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Failed to save performance record');
     }
@@ -70,13 +116,19 @@ export const PerformanceForm: React.FC<PerformanceFormProps> = ({
   };
 
   const examTypeOptions = [
-    { value: ExamType.QUIZ, label: 'Quiz' },
-    { value: ExamType.ASSIGNMENT, label: 'Assignment' },
-    { value: ExamType.MIDTERM, label: 'Midterm' },
-    { value: ExamType.FINAL, label: 'Final' },
+    { value: ExamType.UnitTest, label: 'Unit Test' },
+    { value: ExamType.MidTerm, label: 'Mid-Term' },
+    { value: ExamType.Final, label: 'Final' },
+    { value: ExamType.Assignment, label: 'Assignment' },
+    { value: ExamType.Laboratory, label: 'Laboratory' },
+    { value: ExamType.Presentation, label: 'Presentation' },
+    { value: ExamType.ContinuousAssessment, label: 'Continuous Assessment' },
+    { value: ExamType.Other, label: 'Other' },
   ];
 
-  const percentage = formData.maxScore > 0 ? Math.round((formData.score / formData.maxScore) * 100) : 0;
+  const score = parseFloat(formData.score) || 0;
+  const maxScore = parseFloat(formData.maxScore) || 100;
+  const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ p: 3 }}>
@@ -150,7 +202,7 @@ export const PerformanceForm: React.FC<PerformanceFormProps> = ({
             fullWidth
             type="date"
             label="Exam Date *"
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
             value={formData.examDate}
             onChange={(e) => handleChange('examDate', e.target.value)}
           />
@@ -168,27 +220,25 @@ export const PerformanceForm: React.FC<PerformanceFormProps> = ({
         <Box sx={{ display: 'flex', gap: 2 }}>
           <TextField
             fullWidth
-            type="number"
             label="Score *"
             value={formData.score}
-            onChange={(e) => handleChange('score', parseFloat(e.target.value) || 0)}
-            inputProps={{ min: 0, step: 0.1 }}
+            onChange={(e) => handleChange('score', e.target.value)}
+            placeholder="Enter score (e.g., 85, 92.5)"
           />
 
           <TextField
             fullWidth
-            type="number"
             label="Max Score *"
             value={formData.maxScore}
-            onChange={(e) => handleChange('maxScore', parseFloat(e.target.value) || 100)}
-            inputProps={{ min: 1, step: 0.1 }}
+            onChange={(e) => handleChange('maxScore', e.target.value)}
+            placeholder="Enter max score (e.g., 100)"
           />
 
           <TextField
             fullWidth
             label="Percentage"
             value={`${percentage}%`}
-            InputProps={{ readOnly: true }}
+            slotProps={{ input: { readOnly: true } }}
             variant="filled"
           />
         </Box>

@@ -30,6 +30,20 @@ interface FeeFormData {
   notes?: string;
 }
 
+// Internal form state interface with string values for text inputs
+interface FeeFormState {
+  studentId: string;
+  feeType: FeeType;
+  term: string;
+  totalAmount: string;
+  amountPaid: string;
+  paymentStatus: PaymentStatus;
+  dueDate: string;
+  lastPaymentDate: string;
+  fineAmount: string;
+  notes: string;
+}
+
 interface FeeFormProps {
   students: Student[];
   initialData?: any | null;
@@ -45,31 +59,67 @@ export const FeeForm: React.FC<FeeFormProps> = ({
   onCancel,
   isSubmitting = false,
 }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FeeFormState>({
     studentId: initialData?.studentId || '',
-    feeType: initialData?.feeType || FeeType.TUITION,
+    feeType: initialData?.feeType || FeeType.Tuition,
     term: initialData?.term || '',
-    totalAmount: initialData?.totalAmount || 0,
-    amountPaid: initialData?.amountPaid || 0,
-    paymentStatus: initialData?.paymentStatus || PaymentStatus.PENDING,
+    totalAmount: initialData?.totalAmount?.toString() || '',
+    amountPaid: initialData?.amountPaid?.toString() || '0',
+    paymentStatus: initialData?.paymentStatus || PaymentStatus.Pending,
     dueDate: initialData?.dueDate ? initialData.dueDate.split('T')[0] : '',
     lastPaymentDate: initialData?.lastPaymentDate ? initialData.lastPaymentDate.split('T')[0] : '',
-    fineAmount: initialData?.fineAmount || 0,
+    fineAmount: initialData?.fineAmount?.toString() || '0',
     notes: initialData?.notes || '',
   });
   
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Update form data when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        studentId: initialData.studentId || '',
+        feeType: initialData.feeType || FeeType.Tuition,
+        term: initialData.term || '',
+        totalAmount: initialData.totalAmount?.toString() || '',
+        amountPaid: initialData.amountPaid?.toString() || '0',
+        paymentStatus: initialData.paymentStatus || PaymentStatus.Pending,
+        dueDate: initialData.dueDate ? initialData.dueDate.split('T')[0] : '',
+        lastPaymentDate: initialData.lastPaymentDate ? initialData.lastPaymentDate.split('T')[0] : '',
+        fineAmount: initialData.fineAmount?.toString() || '0',
+        notes: initialData.notes || '',
+      });
+    } else {
+      // Reset form for new records
+      setFormData({
+        studentId: '',
+        feeType: FeeType.Tuition,
+        term: '',
+        totalAmount: '',
+        amountPaid: '0',
+        paymentStatus: PaymentStatus.Pending,
+        dueDate: '',
+        lastPaymentDate: '',
+        fineAmount: '0',
+        notes: '',
+      });
+    }
+  }, [initialData]);
+
   // Auto-update payment status based on amounts
   useEffect(() => {
-    if (formData.totalAmount > 0) {
-      const totalWithFine = formData.totalAmount + formData.fineAmount;
-      if (formData.amountPaid === 0) {
-        setFormData(prev => ({ ...prev, paymentStatus: PaymentStatus.PENDING }));
-      } else if (formData.amountPaid >= totalWithFine) {
-        setFormData(prev => ({ ...prev, paymentStatus: PaymentStatus.PAID }));
+    const totalAmount = parseFloat(formData.totalAmount) || 0;
+    const amountPaid = parseFloat(formData.amountPaid) || 0;
+    const fineAmount = parseFloat(formData.fineAmount) || 0;
+    
+    if (totalAmount > 0) {
+      const totalWithFine = totalAmount + fineAmount;
+      if (amountPaid === 0) {
+        setFormData(prev => ({ ...prev, paymentStatus: PaymentStatus.Pending }));
+      } else if (amountPaid >= totalWithFine) {
+        setFormData(prev => ({ ...prev, paymentStatus: PaymentStatus.Paid }));
       } else {
-        setFormData(prev => ({ ...prev, paymentStatus: PaymentStatus.PARTIAL }));
+        setFormData(prev => ({ ...prev, paymentStatus: PaymentStatus.Partial }));
       }
     }
   }, [formData.totalAmount, formData.amountPaid, formData.fineAmount]);
@@ -78,7 +128,15 @@ export const FeeForm: React.FC<FeeFormProps> = ({
     e.preventDefault();
     try {
       setSubmitError(null);
-      await onSubmit(formData);
+      // Convert string values to numbers for submission
+      const submitData: FeeFormData = {
+        ...formData,
+        totalAmount: parseFloat(formData.totalAmount) || 0,
+        amountPaid: parseFloat(formData.amountPaid) || 0,
+        fineAmount: parseFloat(formData.fineAmount) || 0,
+        lastPaymentDate: formData.lastPaymentDate || undefined,
+      };
+      await onSubmit(submitData);
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Failed to save fee record');
     }
@@ -89,21 +147,24 @@ export const FeeForm: React.FC<FeeFormProps> = ({
   };
 
   const feeTypeOptions = [
-    { value: FeeType.TUITION, label: 'Tuition' },
-    { value: FeeType.EXAM, label: 'Exam' },
-    { value: FeeType.TRANSPORT, label: 'Transport' },
-    { value: FeeType.LIBRARY, label: 'Library' },
-    { value: FeeType.MISC, label: 'Miscellaneous' },
+    { value: FeeType.Tuition, label: 'Tuition' },
+    { value: FeeType.Exam, label: 'Exam' },
+    { value: FeeType.Transport, label: 'Transport' },
+    { value: FeeType.Library, label: 'Library' },
+    { value: FeeType.Misc, label: 'Miscellaneous' },
   ];
 
   const paymentStatusOptions = [
-    { value: PaymentStatus.PENDING, label: 'Pending' },
-    { value: PaymentStatus.PARTIAL, label: 'Partial' },
-    { value: PaymentStatus.PAID, label: 'Paid' },
-    { value: PaymentStatus.OVERDUE, label: 'Overdue' },
+    { value: PaymentStatus.Pending, label: 'Pending' },
+    { value: PaymentStatus.Partial, label: 'Partial' },
+    { value: PaymentStatus.Paid, label: 'Paid' },
+    { value: PaymentStatus.Overdue, label: 'Overdue' },
   ];
 
-  const amountDue = formData.totalAmount - formData.amountPaid + formData.fineAmount;
+  const totalAmount = parseFloat(formData.totalAmount) || 0;
+  const amountPaid = parseFloat(formData.amountPaid) || 0;
+  const fineAmount = parseFloat(formData.fineAmount) || 0;
+  const amountDue = totalAmount - amountPaid + fineAmount;
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ p: 3 }}>
@@ -175,33 +236,35 @@ export const FeeForm: React.FC<FeeFormProps> = ({
         <Box sx={{ display: 'flex', gap: 2 }}>
           <TextField
             fullWidth
-            type="number"
             label="Total Amount *"
             value={formData.totalAmount}
-            onChange={(e) => handleChange('totalAmount', parseFloat(e.target.value) || 0)}
-            InputProps={{
-              startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+            onChange={(e) => handleChange('totalAmount', e.target.value)}
+            slotProps={{
+              input: {
+                startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+              }
             }}
-            inputProps={{ min: 0, step: 0.01 }}
+            placeholder="Enter total amount (e.g., 5000)"
           />
 
           <TextField
             fullWidth
-            type="number"
             label="Amount Paid *"
             value={formData.amountPaid}
-            onChange={(e) => handleChange('amountPaid', parseFloat(e.target.value) || 0)}
-            InputProps={{
-              startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+            onChange={(e) => handleChange('amountPaid', e.target.value)}
+            slotProps={{
+              input: {
+                startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+              }
             }}
-            inputProps={{ min: 0, step: 0.01 }}
+            placeholder="Enter amount paid (e.g., 2500)"
           />
 
           <TextField
             fullWidth
             label="Amount Due"
             value={`₹${amountDue.toFixed(2)}`}
-            InputProps={{ readOnly: true }}
+            slotProps={{ input: { readOnly: true } }}
             variant="filled"
             color={amountDue > 0 ? 'warning' : 'success'}
           />
@@ -226,14 +289,15 @@ export const FeeForm: React.FC<FeeFormProps> = ({
 
           <TextField
             fullWidth
-            type="number"
             label="Fine Amount"
             value={formData.fineAmount}
-            onChange={(e) => handleChange('fineAmount', parseFloat(e.target.value) || 0)}
-            InputProps={{
-              startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+            onChange={(e) => handleChange('fineAmount', e.target.value)}
+            slotProps={{
+              input: {
+                startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+              }
             }}
-            inputProps={{ min: 0, step: 0.01 }}
+            placeholder="Enter fine amount (e.g., 100)"
           />
         </Box>
 
@@ -243,7 +307,7 @@ export const FeeForm: React.FC<FeeFormProps> = ({
             fullWidth
             type="date"
             label="Due Date *"
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
             value={formData.dueDate}
             onChange={(e) => handleChange('dueDate', e.target.value)}
           />
@@ -252,10 +316,10 @@ export const FeeForm: React.FC<FeeFormProps> = ({
             fullWidth
             type="date"
             label="Last Payment Date"
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
             value={formData.lastPaymentDate}
             onChange={(e) => handleChange('lastPaymentDate', e.target.value)}
-            disabled={formData.amountPaid === 0}
+            disabled={parseFloat(formData.amountPaid) === 0}
           />
         </Box>
 
