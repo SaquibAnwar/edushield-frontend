@@ -46,6 +46,12 @@ export enum ParentType {
   GUARDIAN = 2,
 }
 
+export enum ParentStatus {
+  ACTIVE = 0,
+  INACTIVE = 1,
+  SUSPENDED = 2,
+}
+
 // Student entity interface
 export interface Student {
   id: string;
@@ -119,7 +125,8 @@ export interface Parent {
   parentType: ParentType;
   isEmergencyContact: boolean;
   isAuthorizedToPickup: boolean;
-  isActive: boolean;
+  status: ParentStatus;
+  isActive: boolean; // Keep for backward compatibility
   fullName: string;
   age: number;
   fullAddress: string;

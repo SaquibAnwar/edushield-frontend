@@ -27,7 +27,7 @@ import { Gender, ParentType } from '../../../../types/user';
 import type { ParentFormData } from '../../../../types/forms';
 import type { FormProps } from '../../../../types/components';
 
-const ParentForm: React.FC<FormProps<ParentFormData>> = ({
+const ParentForm: React.FC<FormProps<ParentFormData> & { showHeader?: boolean }> = ({
   initialData,
   onSubmit,
   onCancel,
@@ -41,6 +41,7 @@ const ParentForm: React.FC<FormProps<ParentFormData>> = ({
   resetText = 'Reset',
   className,
   testId,
+  showHeader = true,
 }) => {
   const [submitError, setSubmitError] = React.useState<any>(null);
   const [showSuccess, setShowSuccess] = React.useState(false);
@@ -78,6 +79,7 @@ const ParentForm: React.FC<FormProps<ParentFormData>> = ({
       parentType: ParentType.PRIMARY, // Default to Primary
       isEmergencyContact: false, // Default to false
       isAuthorizedToPickup: true, // Default to true
+      isActive: true, // Default to true for new parents
     },
     mode: 'onChange',
   });
@@ -87,8 +89,14 @@ const ParentForm: React.FC<FormProps<ParentFormData>> = ({
       setSubmitError(null);
       setShowSuccess(false);
       
+      // Debug logging
+      console.log('Form submission data:', data);
+      console.log('isActive in form data:', data.isActive);
+      
       // Convert date strings to DateTime objects for backend
       const convertedData = convertFormDatesToDateTime(data, ['dateOfBirth']);
+      console.log('Converted data:', convertedData);
+      
       await onSubmit(convertedData);
       
       // Show success feedback
@@ -148,10 +156,12 @@ const ParentForm: React.FC<FormProps<ParentFormData>> = ({
       {loading && <LoadingSpinner tip="Loading form..." />}
       
       <form onSubmit={handleSubmit(handleFormSubmit)}>
-        <Typography variant="h6" gutterBottom>
-          {mode === 'create' ? 'Create New Parent' : 
-           mode === 'edit' ? 'Edit Parent' : 'Parent Details'}
-        </Typography>
+        {showHeader && (
+          <Typography variant="h6" gutterBottom>
+            {mode === 'create' ? 'Create New Parent' : 
+             mode === 'edit' ? 'Edit Parent' : 'Parent Details'}
+          </Typography>
+        )}
         
         <Divider sx={{ mb: 3 }} />
 
@@ -579,6 +589,25 @@ const ParentForm: React.FC<FormProps<ParentFormData>> = ({
                     />
                   }
                   label="Authorized to Pickup"
+                />
+              )}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <Controller
+              name="isActive"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      {...field}
+                      checked={field.value}
+                      disabled={isFormDisabled}
+                    />
+                  }
+                  label="Active Status"
                 />
               )}
             />
