@@ -260,8 +260,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             label: 'My Performance',
             icon: <GradeIcon />,
             path: '/student/performance',
-            onClick: () => handleNavigation('/student/performance'),
-            disabled: true // Will be enabled in future tasks
+            onClick: () => handleNavigation('/student/performance')
           },
           {
             label: 'Assignments',
@@ -274,8 +273,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             label: 'Fees',
             icon: <PaymentIcon />,
             path: '/student/fees',
-            onClick: () => handleNavigation('/student/fees'),
-            disabled: true // Will be enabled in future tasks
+            onClick: () => handleNavigation('/student/fees')
           },
           {
             label: 'Profile',

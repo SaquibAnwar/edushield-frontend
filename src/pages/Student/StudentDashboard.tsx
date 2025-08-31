@@ -11,11 +11,13 @@ import {
   Grade as GradeIcon,
   Payment as PaymentIcon
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { Layout } from '../../components/layout';
 
 export const StudentDashboard: React.FC = () => {
   const { user, getDisplayName, getEmail } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <Layout>
@@ -82,7 +84,11 @@ export const StudentDashboard: React.FC = () => {
               <Typography variant="body2" color="text.secondary" mb={2}>
                 Academic performance and results
               </Typography>
-              <Button variant="contained" size="small">
+              <Button 
+                variant="contained" 
+                size="small"
+                onClick={() => navigate('/student/performance')}
+              >
                 View Grades
               </Button>
             </Paper>
@@ -97,7 +103,11 @@ export const StudentDashboard: React.FC = () => {
               <Typography variant="body2" color="text.secondary" mb={2}>
                 Payment status and history
               </Typography>
-              <Button variant="contained" size="small">
+              <Button 
+                variant="contained" 
+                size="small"
+                onClick={() => navigate('/student/fees')}
+              >
                 View Fees
               </Button>
             </Paper>
