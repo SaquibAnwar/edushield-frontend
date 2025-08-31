@@ -14,12 +14,14 @@ import {
   Person as PersonIcon,
   ChildCare as ChildIcon,
   Assessment as MetricsIcon,
+  Grade as PerformanceIcon,
+  Payment as FeeIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../hooks/useAuth';
 import { useParentData } from '../../hooks/useParentData';
 import { Layout } from '../../components/layout';
-import { ParentProfile, ChildSelector, ParentMetrics } from '../../components/parent';
+import { ParentProfile, ChildSelector, ParentMetrics, ChildPerformanceView, ChildFeeView } from '../../components/parent';
 import { LoadingSpinner } from '../../components/ui';
 
 interface TabPanelProps {
@@ -123,6 +125,8 @@ export const ParentDashboard: React.FC = () => {
               onChange={handleTabChange}
               aria-label="parent dashboard tabs"
               sx={{ borderBottom: 1, borderColor: 'divider' }}
+              variant="scrollable"
+              scrollButtons="auto"
             >
               <Tab
                 icon={<PersonIcon />}
@@ -137,10 +141,24 @@ export const ParentDashboard: React.FC = () => {
                 aria-controls="parent-tabpanel-1"
               />
               <Tab
-                icon={<MetricsIcon />}
-                label="Overview & Metrics"
+                icon={<PerformanceIcon />}
+                label="Child Performance"
                 id="parent-tab-2"
                 aria-controls="parent-tabpanel-2"
+                disabled={!selectedChild}
+              />
+              <Tab
+                icon={<FeeIcon />}
+                label="Child Fees"
+                id="parent-tab-3"
+                aria-controls="parent-tabpanel-3"
+                disabled={!selectedChild}
+              />
+              <Tab
+                icon={<MetricsIcon />}
+                label="Overview & Metrics"
+                id="parent-tab-4"
+                aria-controls="parent-tabpanel-4"
               />
             </Tabs>
 
@@ -155,10 +173,31 @@ export const ParentDashboard: React.FC = () => {
                 selectedChild={selectedChild}
                 onChildSelect={selectChild}
                 isLoading={isLoading}
+                onTabChange={setActiveTab}
               />
             </TabPanel>
 
             <TabPanel value={activeTab} index={2}>
+              {selectedChild ? (
+                <ChildPerformanceView child={selectedChild} />
+              ) : (
+                <Alert severity="info">
+                  Please select a child from the "My Children" tab to view their performance data.
+                </Alert>
+              )}
+            </TabPanel>
+
+            <TabPanel value={activeTab} index={3}>
+              {selectedChild ? (
+                <ChildFeeView child={selectedChild} />
+              ) : (
+                <Alert severity="info">
+                  Please select a child from the "My Children" tab to view their fee information.
+                </Alert>
+              )}
+            </TabPanel>
+
+            <TabPanel value={activeTab} index={4}>
               {metrics ? (
                 <ParentMetrics metrics={metrics} />
               ) : (
@@ -187,10 +226,28 @@ export const ParentDashboard: React.FC = () => {
               >
                 View Children ({children.length})
               </Button>
+              {selectedChild && (
+                <>
+                  <Button
+                    variant="outlined"
+                    color="success"
+                    onClick={() => setActiveTab(2)}
+                  >
+                    View {selectedChild.firstName}'s Performance
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="warning"
+                    onClick={() => setActiveTab(3)}
+                  >
+                    View {selectedChild.firstName}'s Fees
+                  </Button>
+                </>
+              )}
               <Button
                 variant="outlined"
                 color="info"
-                onClick={() => setActiveTab(2)}
+                onClick={() => setActiveTab(4)}
               >
                 View Metrics
               </Button>

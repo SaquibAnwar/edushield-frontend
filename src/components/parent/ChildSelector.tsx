@@ -9,10 +9,13 @@ import {
   Paper,
   Avatar,
   Chip,
+  Button,
 } from '@mui/material';
 import {
   School as SchoolIcon,
   Person as PersonIcon,
+  Grade as PerformanceIcon,
+  Payment as FeeIcon,
 } from '@mui/icons-material';
 import type { Student } from '../../types/user';
 import { getEnumDisplayName } from '../../utils/enumUtils';
@@ -22,6 +25,7 @@ interface ChildSelectorProps {
   selectedChild: Student | null;
   onChildSelect: (child: Student | null) => void;
   isLoading?: boolean;
+  onTabChange?: (tabIndex: number) => void;
 }
 
 export const ChildSelector: React.FC<ChildSelectorProps> = ({
@@ -29,6 +33,7 @@ export const ChildSelector: React.FC<ChildSelectorProps> = ({
   selectedChild,
   onChildSelect,
   isLoading = false,
+  onTabChange,
 }) => {
   const handleChange = (event: any) => {
     const childId = event.target.value;
@@ -167,6 +172,33 @@ export const ChildSelector: React.FC<ChildSelectorProps> = ({
               </Typography>
             </Box>
           </Box>
+
+          {/* Quick Actions for Selected Child */}
+          {onTabChange && (
+            <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Quick Actions for {selectedChild.firstName}:
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<PerformanceIcon />}
+                  onClick={() => onTabChange(2)}
+                  size="small"
+                >
+                  View Performance
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<FeeIcon />}
+                  onClick={() => onTabChange(3)}
+                  size="small"
+                >
+                  View Fees
+                </Button>
+              </Box>
+            </Box>
+          )}
         </Paper>
       )}
     </Box>
