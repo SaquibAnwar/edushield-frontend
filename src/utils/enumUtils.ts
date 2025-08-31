@@ -1,4 +1,4 @@
-import { Gender, StudentStatus, ExamType, FeeType, PaymentStatus, ParentType } from '../types/user';
+import { Gender, StudentStatus, ExamType, FeeType, PaymentStatus, ParentType, ParentStatus } from '../types/user';
 
 // Gender display utilities
 export const getGenderDisplay = (gender: Gender): string => {
@@ -65,6 +65,48 @@ export const getParentTypeDisplay = (parentType: ParentType): string => {
     default:
       return 'Unknown';
   }
+};
+
+// Parent Status display utilities
+export const getParentStatusDisplay = (status: ParentStatus): string => {
+  switch (status) {
+    case ParentStatus.ACTIVE:
+      return 'Active';
+    case ParentStatus.INACTIVE:
+      return 'Inactive';
+    case ParentStatus.SUSPENDED:
+      return 'Suspended';
+    default:
+      return 'Unknown';
+  }
+};
+
+export const getParentStatusColor = (status: ParentStatus): 'success' | 'default' | 'error' => {
+  switch (status) {
+    case ParentStatus.ACTIVE:
+      return 'success';
+    case ParentStatus.INACTIVE:
+      return 'default';
+    case ParentStatus.SUSPENDED:
+      return 'error';
+    default:
+      return 'default';
+  }
+};
+
+// Helper function to convert isActive boolean to ParentStatus for backward compatibility
+export const getParentStatusFromBoolean = (isActive: boolean): ParentStatus => {
+  return isActive ? ParentStatus.ACTIVE : ParentStatus.INACTIVE;
+};
+
+// Helper function to get status with fallback to isActive
+export const getParentStatusWithFallback = (parent: { status?: ParentStatus; isActive: boolean }): ParentStatus => {
+  return parent.status !== undefined ? parent.status : getParentStatusFromBoolean(parent.isActive);
+};
+
+// Helper function to convert ParentStatus back to isActive boolean for API compatibility
+export const convertStatusToIsActive = (status: ParentStatus): boolean => {
+  return status === ParentStatus.ACTIVE;
 };
 
 // Exam Type display utilities
@@ -202,6 +244,12 @@ export const getParentTypeOptions = () => [
   { value: ParentType.GUARDIAN, label: getParentTypeDisplay(ParentType.GUARDIAN) },
 ];
 
+export const getParentStatusOptions = () => [
+  { value: ParentStatus.ACTIVE, label: getParentStatusDisplay(ParentStatus.ACTIVE) },
+  { value: ParentStatus.INACTIVE, label: getParentStatusDisplay(ParentStatus.INACTIVE) },
+  { value: ParentStatus.SUSPENDED, label: getParentStatusDisplay(ParentStatus.SUSPENDED) },
+];
+
 // Alias functions for consistency with component usage
 export const getGenderLabel = getGenderDisplay;
 export const getStudentStatusLabel = getStudentStatusDisplay;
@@ -209,6 +257,7 @@ export const getExamTypeLabel = getExamTypeDisplay;
 export const getFeeTypeLabel = getFeeTypeDisplay;
 export const getPaymentStatusLabel = getPaymentStatusDisplay;
 export const getParentTypeLabel = getParentTypeDisplay;
+export const getParentStatusLabel = getParentStatusDisplay;
 
 // Export all functions as a single object for easier importing
 export const enumUtils = {
@@ -219,6 +268,9 @@ export const enumUtils = {
   getStudentStatusColor,
   getParentTypeDisplay,
   getParentTypeLabel,
+  getParentStatusDisplay,
+  getParentStatusLabel,
+  getParentStatusColor,
   getExamTypeDisplay,
   getExamTypeLabel,
   getFeeTypeDisplay,
@@ -230,4 +282,5 @@ export const enumUtils = {
   getStudentStatusOptions,
   getGenderOptions,
   getParentTypeOptions,
+  getParentStatusOptions,
 };
