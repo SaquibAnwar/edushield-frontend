@@ -280,6 +280,14 @@ export class ApiService {
     return this.client.get('/auth/me');
   }
 
+  async getCurrentUserParentProfile(): Promise<Parent> {
+    return this.client.get<Parent>('/parents/profile');
+  }
+
+  async getStudentsByParentId(parentId: string): Promise<Student[]> {
+    return this.client.get<Student[]>(`/students/parent/${parentId}`);
+  }
+
   // Student endpoints
   async getStudents(filters?: StudentFilters): Promise<PaginatedResponse<Student>> {
     const params = this.buildQueryParams(filters);
@@ -513,6 +521,10 @@ export class ApiService {
 
   async getStudentMetrics(studentId: string): Promise<StudentMetrics> {
     return this.client.get<StudentMetrics>(`/metrics/student/${studentId}`);
+  }
+
+  async getCurrentUserParentMetrics(): Promise<ParentMetrics> {
+    return this.client.get<ParentMetrics>('/metrics/parent');
   }
 
   async getParentMetrics(parentId: string): Promise<ParentMetrics> {

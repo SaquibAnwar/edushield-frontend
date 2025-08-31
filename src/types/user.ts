@@ -100,6 +100,21 @@ export interface Faculty {
   updatedAt: string;
 }
 
+// Parent child info interface
+export interface ParentChildInfo {
+  id: string;
+  firstName: string;
+  lastName: string;
+  rollNumber: string;
+  grade?: string;
+  section?: string;
+  status: StudentStatus;
+  enrollmentDate: string;
+  fullName: string;
+  age: number;
+  isEnrolled: boolean;
+}
+
 // Parent entity interface
 export interface Parent {
   id: string;
@@ -133,6 +148,7 @@ export interface Parent {
   childrenCount: number;
   createdAt: string;
   updatedAt: string;
+  children?: ParentChildInfo[]; // Children information for parent portal
 }
 
 // Student Performance entity interface
