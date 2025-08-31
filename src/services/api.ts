@@ -43,7 +43,7 @@ class ApiClient {
 
   constructor() {
     this.authService = AuthService.getInstance();
-    
+
     this.axiosInstance = axios.create({
       baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1',
       timeout: 30000, // Increased timeout for better reliability
@@ -70,7 +70,7 @@ class ApiClient {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
-        
+
         // Log request in development
         if (import.meta.env.DEV) {
           console.log(`🚀 ${config.method?.toUpperCase()} ${config.url}`, {
@@ -79,7 +79,7 @@ class ApiClient {
             params: config.params,
           });
         }
-        
+
         return config;
       },
       (error) => {
@@ -98,7 +98,7 @@ class ApiClient {
             data: response.data,
           });
         }
-        
+
         return response;
       },
       async (error) => {
@@ -121,7 +121,7 @@ class ApiClient {
           try {
             // Try to refresh token
             await this.authService.refreshToken();
-            
+
             // Retry original request with new token
             const newToken = storage.getToken();
             if (newToken) {
@@ -132,7 +132,7 @@ class ApiClient {
             // Refresh failed, redirect to login
             console.error('Token refresh failed:', refreshError);
             storage.clearAll();
-            
+
             // Show user-friendly message about session expiration
             if (window.location.pathname !== '/') {
               // Create a temporary toast to show session expired message
@@ -143,13 +143,13 @@ class ApiClient {
                 }
               });
               window.dispatchEvent(event);
-              
+
               // Redirect to login page after a short delay
               setTimeout(() => {
                 window.location.href = '/';
               }, 2000);
             }
-            
+
             return Promise.reject(new Error('Your session has expired. Please log in again.'));
           }
         }
@@ -177,7 +177,7 @@ class ApiClient {
     if (error.response?.data?.message) {
       return error.response.data.message;
     }
-    
+
     if (error.response?.data?.error) {
       return error.response.data.error;
     }
@@ -185,7 +185,7 @@ class ApiClient {
     if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
       return error.response.data.errors.join(', ');
     }
-    
+
     // Default error messages based on status codes
     switch (error.response?.status) {
       case 400:
@@ -531,15 +531,15 @@ export class ApiService {
   // Utility method to build query parameters
   private buildQueryParams(filters?: Record<string, any>): Record<string, any> {
     if (!filters) return {};
-    
+
     const params: Record<string, any> = {};
-    
+
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         params[key] = value;
       }
     });
-    
+
     return params;
   }
 }
