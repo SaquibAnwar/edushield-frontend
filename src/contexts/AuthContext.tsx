@@ -85,6 +85,7 @@ interface AuthContextType {
   loginWithDevAuth: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
+  refreshUserData: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -237,6 +238,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Refresh user data function
+  const refreshUserData = async (): Promise<void> => {
+    try {
+      const currentUser = await authService.getCurrentUser();
+      if (currentUser) {
+        dispatch({
+          type: 'LOGIN_SUCCESS',
+          payload: {
+            user: currentUser,
+            token: state.token,
+            refreshToken: state.refreshToken
+          }
+        });
+      }
+    } catch (error: any) {
+      console.error('Failed to refresh user data:', error);
+      // Don't logout on user data refresh failure, just log the error
+    }
+  };
+
   // Clear error function
   const clearError = (): void => {
     dispatch({ type: 'CLEAR_ERROR' });
@@ -248,6 +269,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loginWithDevAuth,
     logout,
     refreshToken,
+    refreshUserData,
     clearError
   };
 

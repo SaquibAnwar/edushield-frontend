@@ -543,6 +543,23 @@ export class ApiService {
     return this.client.get<Student[]>(`/faculty/${facultyId}/students`);
   }
 
+  // User management endpoints
+  async getUsers(): Promise<any[]> {
+    return this.client.get<any[]>('/user');
+  }
+
+  async getUser(id: string): Promise<any> {
+    return this.client.get<any>(`/user/${id}`);
+  }
+
+  async updateUserRole(id: string, role: number): Promise<any> {
+    return this.client.put<any>(`/user/${id}/role`, { role });
+  }
+
+  async updateUserStatus(id: string, isActive: boolean): Promise<any> {
+    return this.client.put<any>(`/user/${id}/status`, { isActive });
+  }
+
   // Health check endpoint
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
     return this.client.get('/health');
