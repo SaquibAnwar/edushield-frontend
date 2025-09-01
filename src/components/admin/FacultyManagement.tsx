@@ -80,7 +80,6 @@ interface FacultyDetailViewProps {
   onClose: () => void;
   onEdit: (faculty: Faculty) => void;
   onDelete: (faculty: Faculty) => void;
-  students: Student[];
 }
 
 const FacultyDetailView: React.FC<FacultyDetailViewProps> = ({
@@ -88,18 +87,60 @@ const FacultyDetailView: React.FC<FacultyDetailViewProps> = ({
   onClose,
   onEdit,
   onDelete,
-  students,
 }) => {
   const { canManageUsers } = useAdminPermissions();
+  const [assignedStudents, setAssignedStudents] = useState<Student[]>([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
 
-  // Get assigned students for this faculty
-  const assignedStudents = students.filter(student => 
-    student.assignedFaculties?.some(assignment => assignment.facultyId === faculty.id)
-  );
+  // Load assigned students when faculty changes
+  useEffect(() => {
+    const loadAssignedStudents = async () => {
+      try {
+        setLoadingStudents(true);
+        const studentsData = await apiService.getFacultyStudents(faculty.id);
+        
+        // Transform the backend data to match our Student interface
+        const transformedStudents = Array.isArray(studentsData) ? studentsData.map((student: any) => ({
+          id: student.id,
+          firstName: student.firstName,
+          lastName: student.lastName,
+          fullName: `${student.firstName} ${student.lastName}`.trim(),
+          email: student.email,
+          rollNumber: student.rollNumber,
+          grade: student.grade,
+          section: student.section,
+          phoneNumber: student.phoneNumber,
+          address: student.address,
+          dateOfBirth: student.dateOfBirth,
+          gender: student.gender,
+          enrollmentDate: student.enrollmentDate,
+          status: student.status,
+          isEnrolled: student.isActive,
+          assignedFaculties: [],
+          age: 0, // Will be computed if needed
+          parentId: null,
+          userId: null,
+          createdAt: '',
+          updatedAt: ''
+        })) : [];
+        
+        setAssignedStudents(transformedStudents);
+      } catch (err) {
+        console.error('Error loading assigned students:', err);
+        setAssignedStudents([]);
+      } finally {
+        setLoadingStudents(false);
+      }
+    };
+
+    if (faculty.id) {
+      loadAssignedStudents();
+    }
+  }, [faculty.id]);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -285,7 +326,11 @@ const FacultyDetailView: React.FC<FacultyDetailViewProps> = ({
               <Divider sx={{ mb: 2 }} />
 
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {assignedStudents.length > 0 ? (
+                {loadingStudents ? (
+                  <Typography variant="body2" color="text.secondary">
+                    Loading assigned students...
+                  </Typography>
+                ) : assignedStudents.length > 0 ? (
                   assignedStudents.map((student) => (
                     <Chip
                       key={student.id}
@@ -320,7 +365,6 @@ export const FacultyManagement: React.FC = () => {
   // Data states
   const [allFaculties, setAllFaculties] = useState<Faculty[]>([]);
   const [faculties, setFaculties] = useState<Faculty[]>([]);
-  const [students, setStudents] = useState<Student[]>([]);
   const [totalFaculties, setTotalFaculties] = useState(0);
 
   // Loading states
@@ -439,18 +483,7 @@ export const FacultyManagement: React.FC = () => {
     }
   }, [isAuthenticated]);
 
-  const loadStudents = useCallback(async () => {
-    try {
-      const response = await apiService.getStudents();
-      // Backend returns paginated response for students
-      const validStudents = response?.data ? response.data.filter(student => {
-        return student && typeof student === 'object' && student.id;
-      }) : [];
-      setStudents(validStudents);
-    } catch (err) {
-      setStudents([]);
-    }
-  }, []);
+
 
   // Effects
   useEffect(() => {
@@ -462,9 +495,7 @@ export const FacultyManagement: React.FC = () => {
     };
   }, [loadFaculties]);
 
-  useEffect(() => {
-    loadStudents();
-  }, [loadStudents]);
+
 
   // Handlers
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -581,8 +612,25 @@ export const FacultyManagement: React.FC = () => {
       };
 
       if (selectedFaculty) {
+        // For updates, only send changed fields to avoid email conflict
+        const updateData: any = {};
+        
+        // Only include fields that have actually changed
+        if (data.firstName !== selectedFaculty.firstName) updateData.firstName = data.firstName;
+        if (data.lastName !== selectedFaculty.lastName) updateData.lastName = data.lastName;
+        if (data.email !== selectedFaculty.email) updateData.email = data.email;
+        if (data.phoneNumber !== selectedFaculty.phoneNumber) updateData.phoneNumber = data.phoneNumber;
+        if (data.dateOfBirth !== selectedFaculty.dateOfBirth.split('T')[0]) updateData.dateOfBirth = new Date(data.dateOfBirth);
+        if (data.address !== selectedFaculty.address) updateData.address = data.address;
+        if (data.gender !== selectedFaculty.gender) updateData.gender = data.gender;
+        if (data.department !== selectedFaculty.department) updateData.department = data.department;
+        if (data.subject !== selectedFaculty.subject) updateData.subject = data.subject;
+        if (data.hireDate !== selectedFaculty.hireDate.split('T')[0]) updateData.hireDate = new Date(data.hireDate);
+        if (data.isActive !== selectedFaculty.isActive) updateData.isActive = data.isActive;
+        if ((data.userId || '') !== (selectedFaculty.userId || '')) updateData.userId = data.userId || undefined;
+
         // Update existing faculty
-        await apiService.updateFaculty(selectedFaculty.id, apiData);
+        await apiService.updateFaculty(selectedFaculty.id, updateData);
         showSuccess(
           'Faculty Updated',
           `${data.firstName} ${data.lastName} has been updated successfully`
@@ -599,7 +647,14 @@ export const FacultyManagement: React.FC = () => {
       }
 
       setSelectedFaculty(null);
-      await loadFaculties();
+      
+      // Reload faculties data
+      try {
+        await loadFaculties();
+      } catch (loadError) {
+        console.error('Error reloading faculties:', loadError);
+        // Don't show error toast for reload failure, the main operation succeeded
+      }
     } catch (err) {
       console.error('Form submission error:', err);
       showError(
@@ -914,7 +969,6 @@ export const FacultyManagement: React.FC = () => {
               onClose={() => setDetailModalOpen(false)}
               onEdit={handleEditFaculty}
               onDelete={handleDeleteFaculty}
-              students={students}
             />
           )}
         </Modal>

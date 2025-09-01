@@ -80,13 +80,8 @@ const FacultyForm: React.FC<FormProps<FacultyFormData>> = ({
             const formattedData = convertFormDatesToDateTime(data, ['dateOfBirth', 'hireDate']);
             await onSubmit(formattedData);
             
-            // Show success feedback
+            // Show success feedback (local to form only)
             setShowSuccess(true);
-            const actionText = mode === 'edit' ? 'updated' : 'created';
-            showSuccessToast(
-                `Faculty ${actionText} successfully`,
-                `${data.firstName} ${data.lastName} has been ${actionText}.`
-            );
             
             // Reset form if creating new faculty
             if (mode === 'create') {
@@ -96,9 +91,9 @@ const FacultyForm: React.FC<FormProps<FacultyFormData>> = ({
             handleError(error, 'FacultyForm submission');
             setSubmitError(error);
             
-            // Show error toast for better visibility
-            const { title, message } = formatForDisplay(error);
-            showErrorToast(title, message);
+            // Let the parent component handle toast notifications
+            // Re-throw the error so parent can handle it
+            throw error;
         }
     };
 

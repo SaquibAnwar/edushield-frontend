@@ -312,56 +312,21 @@ const StudentDetailView: React.FC<StudentDetailViewProps> = ({
 
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   {student.assignedFaculties?.length > 0 ? (
-                    student.assignedFaculties.map((assignment) => {
-                      // Try multiple ways to find the faculty
-                      let faculty = assignment.faculty;
-
-                      if (!faculty) {
-                        // Try exact ID match first
-                        faculty = faculties.find((f: any) => f.id === assignment.facultyId);
-                      }
-
-                      if (!faculty && assignment.facultyId) {
-                        // Try partial ID match (in case of ID format differences)
-                        faculty = faculties.find((f: any) =>
-                          f.id && assignment.facultyId && (
-                            assignment.facultyId.includes(f.id) || f.id.includes(assignment.facultyId)
-                          )
-                        );
-                      }
-
-                      let facultyName;
-
-                      // Check if assignment has embedded faculty data
-                      if (assignment.faculty?.firstName && assignment.faculty?.lastName) {
-                        // Faculty data is embedded directly in the assignment
-                        const name = `${assignment.faculty.firstName} ${assignment.faculty.lastName}`;
-                        const subject = assignment.faculty.subject || '';
-                        facultyName = subject ? `${name} - ${subject}` : name;
-                      } else if (faculty) {
-                        // Found faculty in the faculties list
-                        const name = faculty.fullName || `${faculty.firstName || ''} ${faculty.lastName || ''}`.trim() || 'Unknown Faculty';
-                        const subject = faculty.subject || '';
-                        facultyName = subject ? `${name} - ${subject}` : name;
-                      } else if (assignment.faculty) {
-                        // Use nested faculty object
-                        const name = assignment.faculty.fullName ||
-                          `${assignment.faculty.firstName || ''} ${assignment.faculty.lastName || ''}`.trim() ||
-                          'Unknown Faculty';
-                        const subject = assignment.faculty.subject || '';
-                        facultyName = subject ? `${name} - ${subject}` : name;
-                      } else {
-                        // Fallback
-                        facultyName = 'Faculty (ID not found)';
-                      }
+                    student.assignedFaculties.map((facultyAssignment) => {
+                      // The backend returns FacultyAssignmentDto objects directly
+                      // These have firstName, lastName, department, subject properties
+                      const facultyName = facultyAssignment.fullName || 
+                        `${facultyAssignment.firstName} ${facultyAssignment.lastName}`.trim();
+                      const subject = facultyAssignment.subject || '';
+                      const displayName = subject ? `${facultyName} - ${subject}` : facultyName;
 
                       return (
                         <Chip
-                          key={assignment.id}
-                          label={facultyName}
+                          key={facultyAssignment.id}
+                          label={displayName}
                           variant="outlined"
                           size="small"
-                          color={faculty ? 'primary' : 'secondary'}
+                          color="primary"
                         />
                       );
                     })
@@ -971,8 +936,7 @@ export const StudentManagement: React.FC = () => {
             <StudentForm
               initialData={{
                 ...selectedStudent,
-                // Since faculty IDs don't match between assignments and available faculties,
-                // we need to find matching faculties by name or other criteria
+                // Match faculty assignments to available faculties by name
                 facultyIds: (() => {
                   if (!selectedStudent.assignedFaculties || !Array.isArray(faculties)) {
                     return [];
@@ -981,7 +945,7 @@ export const StudentManagement: React.FC = () => {
                   const matchedIds: string[] = [];
                   selectedStudent.assignedFaculties.forEach(assignment => {
                     // Try to find matching faculty by name
-                    const assignmentName = assignment.faculty ? `${assignment.faculty.firstName} ${assignment.faculty.lastName}` : '';
+                    const assignmentName = `${assignment.firstName} ${assignment.lastName}`.trim();
                     const matchingFaculty = faculties.find((f: any) =>
                       f.fullName === assignmentName ||
                       `${f.firstName} ${f.lastName}` === assignmentName
@@ -991,7 +955,6 @@ export const StudentManagement: React.FC = () => {
                       matchedIds.push(matchingFaculty.id);
                     }
                   });
-
 
                   return matchedIds;
                 })()

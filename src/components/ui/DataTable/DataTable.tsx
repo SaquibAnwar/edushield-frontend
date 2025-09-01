@@ -36,6 +36,7 @@ function DataTable<T extends Record<string, any>>({
     data,
     columns,
     loading = false,
+    rowKey,
     pagination,
     selection,
     onRowClick,
@@ -147,6 +148,17 @@ function DataTable<T extends Record<string, any>>({
         return selection?.selectedRowKeys.indexOf(String(index)) !== -1;
     };
 
+    const getRowKey = (item: T, index: number): string => {
+        if (rowKey) {
+            if (typeof rowKey === 'function') {
+                return rowKey(item, index);
+            }
+            return String(item[rowKey]);
+        }
+        // Fallback to id property or index
+        return item.id ? String(item.id) : String(index);
+    };
+
     const renderCellContent = (column: Column<T>, item: T, index: number) => {
         if (column.render) {
             return column.render(item[column.key as keyof T], item, index);
@@ -254,7 +266,7 @@ function DataTable<T extends Record<string, any>>({
                                     const isExpanded = state.expandedRows.has(String(index));
 
                                     return (
-                                        <React.Fragment key={index}>
+                                        <React.Fragment key={getRowKey(item, index)}>
                                             <TableRow
                                                 hover={!!onRowClick}
                                                 onClick={() => onRowClick?.(item, index)}

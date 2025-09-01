@@ -51,6 +51,7 @@ export interface DataTableProps<T> extends BaseComponentProps {
   data: T[];
   columns: Column<T>[];
   loading?: boolean;
+  rowKey?: keyof T | ((record: T, index: number) => string);
   pagination?: {
     current: number;
     pageSize: number;

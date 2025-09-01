@@ -14,7 +14,7 @@ import { AdminSettings } from '../pages/Admin/AdminSettings';
 import { StudentManagement, StudentDataManagement, FacultyManagement, ParentManagement } from '../components/admin';
 import { StudentDashboard, StudentPerformance, StudentFees } from '../pages/Student';
 import { ParentDashboard } from '../pages/Parent';
-import { FacultyDashboard } from '../pages/Faculty';
+import { FacultyDashboard, FacultyStudents, FacultyPerformance } from '../pages/Faculty';
 import { TestComponentsGuard } from '../components/ui/TestComponents/TestComponentsGuard';
 import TestForms from '../pages/TestForms';
 
@@ -209,6 +209,20 @@ export const routeConfigs: RouteConfig[] = [
     requiredRoles: ROUTE_PERMISSIONS.FACULTY_ONLY,
     exact: true,
     description: 'Redirect to faculty dashboard'
+  },
+  {
+    path: '/faculty/students',
+    element: <FacultyStudents />,
+    requiredRoles: ROUTE_PERMISSIONS.FACULTY_ONLY,
+    exact: true,
+    description: 'Faculty student management page'
+  },
+  {
+    path: '/faculty/performance',
+    element: <FacultyPerformance />,
+    requiredRoles: ROUTE_PERMISSIONS.FACULTY_ONLY,
+    exact: true,
+    description: 'Faculty performance management page'
   }
 ];
 

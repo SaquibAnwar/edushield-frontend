@@ -424,6 +424,7 @@ const ParentManagement: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<ParentFilters>({});
   const [showFilters, setShowFilters] = useState(false);
@@ -451,12 +452,21 @@ const ParentManagement: React.FC = () => {
         search: searchTerm || undefined,
       };
       
+      console.log('Loading parents with filters:', searchFilters);
       const data = await apiService.getParents(searchFilters);
-      setParents(data);
+      console.log('Loaded parents:', data?.length || 0, 'parents');
+      
+      // Ensure we have valid data
+      const validParents = Array.isArray(data) ? data.filter(parent => 
+        parent && typeof parent === 'object' && parent.id
+      ) : [];
+      
+      setParents(validParents);
     } catch (err: any) {
       console.error('Failed to load parents:', err);
       setError(err.message || 'Failed to load parents');
       showError('Failed to load parents', err.message);
+      setParents([]); // Clear parents on error
     } finally {
       setLoading(false);
     }
@@ -543,12 +553,32 @@ const ParentManagement: React.FC = () => {
   const handleDelete = async () => {
     if (!selectedParent) return;
     
+    const parentToDelete = selectedParent; // Capture the parent to delete
+    
     try {
-      await apiService.deleteParent(selectedParent.id);
-      showSuccess('Parent deleted successfully', `${selectedParent.fullName} has been removed.`);
+      await apiService.deleteParent(parentToDelete.id);
+      
+      // Immediately update local state to remove the deleted parent
+      setParents(prev => {
+        const updated = prev.filter(p => p.id !== parentToDelete.id);
+        console.log('Immediately removing parent from state. Before:', prev.length, 'After:', updated.length);
+        return updated;
+      });
+      
+      // Force re-render
+      setRefreshKey(prev => prev + 1);
+      
+      showSuccess('Parent deleted successfully', `${parentToDelete.fullName} has been removed.`);
       setShowDeleteDialog(false);
       setSelectedParent(null);
-      loadParents();
+      
+      // Also refresh from server to ensure consistency
+      setTimeout(() => {
+        loadParents().catch(loadError => {
+          console.error('Error reloading parents after delete:', loadError);
+        });
+      }, 100);
+      
     } catch (err: any) {
       console.error('Failed to delete parent:', err);
       showError('Failed to delete parent', err.message);
@@ -712,7 +742,7 @@ const ParentManagement: React.FC = () => {
 
   // Filtered and sorted data
   const filteredParents = useMemo(() => {
-    console.log('Filtering parents. Total:', parents.length, 'Filters:', filters);
+    console.log('Filtering parents. Total:', parents.length, 'Filters:', filters, 'Search:', searchTerm);
     let filtered = [...parents];
 
     // Apply search
@@ -742,7 +772,7 @@ const ParentManagement: React.FC = () => {
       console.log('After active status filter:', filtered.length, 'from', beforeCount);
     }
 
-    console.log('Final filtered count:', filtered.length);
+    console.log('Final filtered count:', filtered.length, 'Parent IDs:', filtered.map(p => p.id));
     return filtered;
   }, [parents, searchTerm, filters]);
 
@@ -892,9 +922,11 @@ const ParentManagement: React.FC = () => {
 
               {/* Data Table */}
               <DataTable
+                key={`parents-table-${refreshKey}-${parents.length}-${filteredParents.length}`}
                 data={filteredParents}
                 columns={columns}
                 loading={loading}
+                rowKey="id"
                 onRowClick={openDetailModal}
               />
             </Box>

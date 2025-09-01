@@ -186,15 +186,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             label: 'My Students',
             icon: <PeopleIcon />,
             path: '/faculty/students',
-            onClick: () => handleNavigation('/faculty/students'),
-            disabled: true // Will be enabled in future tasks
+            onClick: () => handleNavigation('/faculty/students')
           },
           {
             label: 'Performance Management',
             icon: <GradeIcon />,
             path: '/faculty/performance',
-            onClick: () => handleNavigation('/faculty/performance'),
-            disabled: true // Will be enabled in future tasks
+            onClick: () => handleNavigation('/faculty/performance')
           },
           {
             label: 'Assignments',

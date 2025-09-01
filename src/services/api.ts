@@ -341,6 +341,10 @@ export class ApiService {
     return this.client.get<Faculty>(`/faculty/${id}`);
   }
 
+  async getFacultyByEmail(email: string): Promise<Faculty> {
+    return this.client.get<Faculty>(`/faculty/email/${encodeURIComponent(email)}`);
+  }
+
   async createFaculty(data: CreateFacultyRequest): Promise<Faculty> {
     // Convert Date objects to ISO strings for backend
     const requestData = {
@@ -533,6 +537,10 @@ export class ApiService {
 
   async getFacultyMetrics(facultyId: string): Promise<FacultyMetrics> {
     return this.client.get<FacultyMetrics>(`/metrics/faculty/${facultyId}`);
+  }
+
+  async getFacultyStudents(facultyId: string): Promise<Student[]> {
+    return this.client.get<Student[]>(`/faculty/${facultyId}/students`);
   }
 
   // Health check endpoint

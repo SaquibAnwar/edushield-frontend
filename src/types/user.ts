@@ -196,8 +196,19 @@ export interface StudentFee {
   updatedAt: string;
 }
 
-// Faculty Assignment interface
+// Faculty Assignment interface - matches backend FacultyAssignmentDto
 export interface FacultyAssignment {
+  id: string;
+  firstName: string;
+  lastName: string;
+  department: string;
+  subject: string;
+  assignedDate: string;
+  fullName: string;
+}
+
+// Legacy Faculty Assignment interface for backward compatibility
+export interface LegacyFacultyAssignment {
   id: string;
   studentId: string;
   facultyId: string;
@@ -221,3 +232,5 @@ export interface ParentStudent {
   parent?: Parent;
   student?: Student;
 }
+
+
