@@ -9,7 +9,7 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
 
-  const { state, login, loginWithDevAuth, logout, refreshToken, clearError } = context;
+  const { state, login, loginWithDevAuth, logout, refreshToken, refreshUserData, clearError } = context;
 
   // Helper functions
   const hasRole = (role: UserRole): boolean => {
@@ -73,6 +73,7 @@ export const useAuth = () => {
     loginWithDevAuth,
     logout,
     refreshAuthToken: refreshToken,
+    refreshUserData,
     clearError,
 
     // Helper functions
